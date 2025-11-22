@@ -5,99 +5,44 @@
   <title>Peak District Hikes Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
+
   <style>
-    :root{
-      --brand:#EC2629;
-      --bg:#0f0f10;
-      --card:#171718;
-      --card2:#1d1e1f;
-      --text:#e9e9ea;
-      --muted:#b7b7bb;
+    html, body { margin:0; height:100%; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { display:grid; grid-template-columns: 320px 1fr; height:100%; }
+    #sidebar {
+      background:#111; color:#fff; overflow:auto; border-right:1px solid #222;
     }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#000}
-    #app{display:grid;grid-template-columns:320px 1fr;height:100%}
-
-    /* Sidebar */
-    #sidebar{background:var(--bg);color:var(--text);overflow:auto;border-right:1px solid #1b1b1c}
-    .title{padding:16px 16px 8px;font-weight:800;font-size:18px}
-    .cards{display:flex;flex-direction:column;gap:10px;padding:10px 10px 20px}
-    .card{
-      background:linear-gradient(180deg,var(--card),var(--card2));
-      border:1px solid #212224;border-radius:14px;padding:12px;cursor:pointer;
-      display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
-      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    .title { padding:16px 16px 8px; font-weight:700; font-size:18px; }
+    .item {
+      padding:12px 16px; border-top:1px solid #1e1e1e; cursor:pointer;
+      display:flex; gap:10px; align-items:center;
     }
-    .card:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.35);border-color:#2a2b2e}
-    .name{font-weight:700}
-    .links{display:flex;gap:10px}
-    .links a{color:#9cc9ff;text-decoration:none;font-size:12px}
-    .active{outline:2px solid var(--brand);outline-offset:2px}
+    .item:hover { background:#181818; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#EC2629; box-shadow:0 0 0 3px #fff inset; }
+    .item.active { background:#1f1f1f; }
+    .links { display:flex; gap:10px; margin-left:auto; }
+    .links a { color:#9cc9ff; text-decoration:none; font-size:12px; }
+    #map { position:relative; }
+    #mapCanvas { position:absolute; inset:0; }
 
-    /* Map */
-    #map{position:relative;background:#000}
-    #mapCanvas{position:absolute;inset:0}
-
-    /* Custom marker pin */
-    .pin{
-      width:28px;height:28px;border-radius:50%;
-      background:var(--brand);border:3px solid #fff;
+    /* custom marker: red circle with white hiker */
+    .pin {
+      width:28px; height:28px; border-radius:50%;
+      background:#EC2629; border:3px solid #fff;
       box-shadow:0 3px 10px rgba(0,0,0,.35);
-      display:grid;place-items:center;
+      display:grid; place-items:center;
     }
-    .pin svg{width:14px;height:14px;fill:#fff}
-
-    /* Layers button + panel */
-    .layers-wrap{position:absolute;top:14px;right:14px;z-index:5}
-    .btn{
-      width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
-      border:3px solid #fff;background:linear-gradient(180deg,var(--brand),#b51d20);
-      box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:pointer;transition:.15s
-    }
-    .btn:hover{background:linear-gradient(180deg,#3899EC,#297fc8)}
-    .btn svg{width:22px;height:22px;fill:#fff}
-    .panel{
-      position:absolute;top:0;right:56px;display:none;gap:8px;align-items:center;
-      border-radius:999px;border:3px solid #fff;background:linear-gradient(180deg,var(--brand),#b51d20);
-      padding:6px 10px;box-shadow:0 3px 10px rgba(0,0,0,.35)
-    }
-    .layers-wrap.open .panel{display:flex}
-    .chip{
-      font-size:13px;color:#fff;border:2px solid #fff;border-radius:999px;padding:6px 10px;cursor:pointer;
-      background:transparent;user-select:none
-    }
-    .chip.active{background:#fff;color:#111}
-    .chip:focus{outline:none}
-    @media (max-width: 900px){
-      #app{grid-template-columns:1fr}
-      #sidebar{position:absolute;z-index:6;inset:auto 10px 10px 10px;border-radius:14px;max-height:45%;box-shadow:0 10px 28px rgba(0,0,0,.45)}
-    }
+    .pin svg { width:14px; height:14px; }
   </style>
 </head>
 <body>
 <div id="app">
-  <aside id="sidebar">
+  <div id="sidebar">
     <div class="title">Peak District Hikes</div>
-    <div class="cards" id="cards"></div>
-  </aside>
-
+    <div id="list"></div>
+  </div>
   <div id="map">
     <div id="mapCanvas"></div>
-
-    <!-- Layers control -->
-    <div class="layers-wrap" id="layers">
-      <div class="btn" id="btnLayers" title="Layers">
-        <!-- Layers SVG -->
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 3 1 9l11 6 11-6-11-6zm0 18L1 15l2.7-1.5L12 18l8.3-4.5L23 15l-11 6zm0-5L1 10l2.7-1.5L12 13l8.3-4.5L23 10l-11 6z"/>
-        </svg>
-      </div>
-      <div class="panel" id="layerPanel">
-        <button class="chip active" id="styleSat">Satellite</button>
-        <button class="chip" id="styleOut">Outdoors</button>
-        <button class="chip active" id="toggleRoutes">Routes: On</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -106,7 +51,7 @@
 <script>
   mapboxgl.accessToken = "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
-  // Your hikes
+  // ---- EDIT THESE (add your GPX raw URLs) ----
   const hikes = [
     {
       id: "derwent-edge",
@@ -114,16 +59,7 @@
       coords: [-1.694, 53.409],
       hikeUrl: "https://thelostpeak.co.uk/hikes/derwent-edge",
       directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.409,-1.694",
-      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
-      animate: true
-    },
-    {
-      id: "kinder-scout",
-      name: "Kinder Scout",
-      coords: [-1.8743, 53.3832],
-      hikeUrl: "https://thelostpeak.co.uk/hikes/kinder-scout",
-      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.3832,-1.8743",
-      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx",
+      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/gpx/derwent-edge.gpx",
       animate: true
     },
     {
@@ -132,12 +68,22 @@
       coords: [-1.8689, 53.4329],
       hikeUrl: "https://thelostpeak.co.uk/hikes/crashed-plane",
       directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
-      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
+      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/gpx/crashed-plane.gpx",
       animate: true
+    },
+    {
+      id: "kinder-scout",
+      name: "Kinder Scout",
+      coords: [-1.8743, 53.3832],
+      hikeUrl: "https://thelostpeak.co.uk/hikes/kinder-scout",
+      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.3832,-1.8743",
+      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/gpx/kinder-scout.gpx",
+      animate: false
     }
   ];
+  // --------------------------------------------
 
-  // Map init (Satellite default)
+  // Map
   const map = new mapboxgl.Map({
     container: "mapCanvas",
     style: "mapbox://styles/mapbox/satellite-streets-v12",
@@ -146,37 +92,40 @@
   });
   map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
-  // Sidebar cards
-  const cardsEl = document.getElementById("cards");
-  function renderCards(){
-    cardsEl.innerHTML = "";
+  // UI: Sidebar list
+  const list = document.getElementById("list");
+  let activeId = null;
+  function renderList(){
+    list.innerHTML = "";
     hikes.forEach(h => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.dataset.id = h.id;
-      card.innerHTML = `
-        <div>
-          <div class="name">${h.name}</div>
-          <div style="color:var(--muted);font-size:12px;margin-top:4px;">Click to focus, open popup and draw the route</div>
-        </div>
+      const row = document.createElement("div");
+      row.className = "item";
+      row.dataset.id = h.id;
+      row.innerHTML = `
+        <div class="dot"></div>
+        <div>${h.name}</div>
         <div class="links">
           <a href="${h.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
           <a href="${h.directionsUrl}" target="_blank" rel="noopener">Directions</a>
-        </div>`;
-      card.onclick = () => focusHike(h.id, true, true);
-      cardsEl.appendChild(card);
+        </div>
+      `;
+      row.onclick = () => focusHike(h.id, true);
+      list.appendChild(row);
     });
   }
-  function setActiveCard(id){
-    [...document.querySelectorAll(".card")].forEach(c => c.classList.toggle("active", c.dataset.id === id));
+  function setActive(id){
+    activeId = id;
+    [...document.querySelectorAll(".item")].forEach(el=>{
+      el.classList.toggle("active", el.dataset.id===id);
+    });
   }
 
-  // Custom pin element
+  // Custom marker element (red circle + simple hiker SVG)
   function makePin(){
     const el = document.createElement("div");
     el.className = "pin";
     el.innerHTML = `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <circle cx="12" cy="5" r="2.2"></circle>
         <path d="M10 22v-6l-2-2 1.5-3 2 2 .5 3.5 3-2 1 1.7-3.6 2.5V22h-2zM15 11l-2-2 2-1.2 2 1.2-2 2z"/>
       </svg>`;
@@ -187,210 +136,107 @@
   function popupHTML(h){
     return `
       <div style="font-size:14px;">
-        <div style="font-weight:700;margin-bottom:4px;">${h.name}</div>
+        <div style="font-weight:700; margin-bottom:4px;">${h.name}</div>
         <div style="margin-bottom:2px;"><a href="${h.hikeUrl}" target="_blank" rel="noopener">Hike Page</a></div>
         <div><a href="${h.directionsUrl}" target="_blank" rel="noopener">Directions</a></div>
       </div>`;
   }
 
-  // Store markers, popups, sources, layer ids, animation state
+  // Load GPX and add as a line layer
+  async function addGpx(h){
+    if(!h.gpx) return;
+    try{
+      const resp = await fetch(h.gpx);
+      if(!resp.ok) return;
+      const text = await resp.text();
+      const xml = new DOMParser().parseFromString(text, "application/xml");
+      const gj = toGeoJSON.gpx(xml);
+      const line = gj.features.find(f => f.geometry && f.geometry.type === "LineString");
+      if(!line) return;
+
+      const sourceId = `route-${h.id}`;
+      const layerId  = `route-line-${h.id}`;
+
+      if(!map.getSource(sourceId)){
+        map.addSource(sourceId, { type:"geojson", data: line });
+        map.addLayer({
+          id: layerId,
+          type: "line",
+          source: sourceId,
+          paint: {
+            "line-color": "#EC2629",
+            "line-width": 4,
+            "line-opacity": 0.95
+          }
+        });
+
+        if(h.animate){
+          animateDash(layerId);
+        }
+      }
+    }catch(e){}
+  }
+
+  // Simple “draw-on” animation using dasharray
+  function animateDash(layerId){
+    let t = 0;
+    function frame(){
+      // dash grows then loops
+      const dash = [t, 100 - t];
+      map.setPaintProperty(layerId, "line-dasharray", dash);
+      t = (t + 1.5) % 100;
+      requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  // Markers + routes
   const markers = {};
   const popups  = {};
-  const sources = {};
-  const layers  = {};
-  const animTimers = {};
 
-  // Add a GPX route as a source + layered line
-  async function addRoute(h){
-    if (!h.gpx) return;
-    // already added?
-    if (sources[h.id]) return;
+  map.on("load", async () => {
+    renderList();
 
-    const resp = await fetch(h.gpx);
-    if(!resp.ok) return;
-    const text = await resp.text();
-    const xml = new DOMParser().parseFromString(text, "application/xml");
-    const gj = toGeoJSON.gpx(xml);
-
-    // find first LineString
-    const line = gj.features.find(f => f.geometry && f.geometry.type === "LineString");
-    if(!line) return;
-
-    const srcId = `route-${h.id}`;
-    const lyrId = `route-line-${h.id}`;
-    sources[h.id] = srcId;
-    layers[h.id]  = lyrId;
-
-    // Add source
-    map.addSource(srcId, { type:"geojson", data: line });
-
-    // GPS draw-on animation uses line-gradient + ["line-progress"]
-    // We'll animate a cutoff 't' from 0 -> 1 and update the gradient stops
-    const basePaint = {
-      "line-width": 4,
-      "line-opacity": 0.95
-    };
-
-    map.addLayer({
-      id: lyrId,
-      type: "line",
-      source: srcId,
-      paint: {
-        ...basePaint,
-        "line-gradient": [
-          "interpolate", ["linear"], ["line-progress"],
-          0, "rgba(236,38,41,0)",
-          0.0001, "#EC2629",
-          1, "#EC2629"
-        ]
-      }
-    });
-
-    if(h.animate){
-      startDrawAnimation(h.id);
-    }else{
-      // static red line
-      map.setPaintProperty(lyrId, "line-color", "#EC2629");
-      map.setPaintProperty(lyrId, "line-gradient", null);
-    }
-  }
-
-  // Animate draw-on: move cutoff from 0 -> 1, then leave solid line
-  function startDrawAnimation(id){
-    stopDrawAnimation(id);
-    let t = 0;
-    const lyrId = layers[id];
-    if(!lyrId) return;
-
-    function step(){
-      t += 0.01; // speed; smaller = slower
-      if(t >= 1){
-        // finish: set solid red line, stop anim
-        map.setPaintProperty(lyrId, "line-gradient", null);
-        map.setPaintProperty(lyrId, "line-color", "#EC2629");
-        cancelAnimationFrame(animTimers[id]);
-        animTimers[id] = null;
-        return;
-      }
-      // Gradient: transparent before t, red up to t
-      const grad = [
-        "interpolate", ["linear"], ["line-progress"],
-        0, "rgba(236,38,41,0)",
-        Math.max(0.0001, t - 0.0001), "rgba(236,38,41,0)",
-        t, "#EC2629",
-        1, "#EC2629"
-      ];
-      map.setPaintProperty(lyrId, "line-gradient", grad);
-      animTimers[id] = requestAnimationFrame(step);
-    }
-    animTimers[id] = requestAnimationFrame(step);
-  }
-  function stopDrawAnimation(id){
-    if(animTimers[id]){
-      cancelAnimationFrame(animTimers[id]);
-      animTimers[id] = null;
-    }
-  }
-
-  // Add markers + popups + routes; fit bounds
-  map.on("load", async ()=>{
-    renderCards();
-
+    // fit bounds around all points
     const bounds = new mapboxgl.LngLatBounds();
     hikes.forEach(h => bounds.extend(h.coords));
     map.fitBounds(bounds, { padding: 40 });
 
     for(const h of hikes){
-      // Marker
+      // marker
       const marker = new mapboxgl.Marker({ element: makePin() })
         .setLngLat(h.coords)
         .addTo(map);
+
       const popup = new mapboxgl.Popup({ offset: 28 }).setHTML(popupHTML(h));
       marker.setPopup(popup);
+
       marker.getElement().addEventListener("click", () => {
-        setActiveCard(h.id);
+        setActive(h.id);
         popup.addTo(map);
       });
+
       markers[h.id] = marker;
       popups[h.id]  = popup;
 
-      // Route
-      await addRoute(h);
+      // route
+      await addGpx(h);
     }
   });
 
-  // Focus from sidebar: center, open popup, optionally restart animation
-  function focusHike(id, openPopup=true, restartAnim=false){
-    const h = hikes.find(x=>x.id===id);
+  // Focus a hike from the sidebar
+  function focusHike(id, openPopup){
+    const h = hikes.find(x => x.id === id);
     if(!h) return;
-    setActiveCard(id);
     map.easeTo({ center: h.coords, zoom: 12.5, duration: 900 });
+    setActive(id);
     if(openPopup && popups[id]) popups[id].addTo(map);
-
-    if(restartAnim && layers[id]){
-      // reset draw-on by re-applying gradient and restarting
-      map.setPaintProperty(layers[id], "line-gradient", [
-        "interpolate", ["linear"], ["line-progress"],
-        0, "rgba(236,38,41,0)",
-        0.0001, "#EC2629",
-        1, "#EC2629"
-      ]);
-      startDrawAnimation(id);
-    }
   }
 
-  /* Layers control */
-  const layersWrap = document.getElementById("layers");
-  const btnLayers  = document.getElementById("btnLayers");
-  const styleSat   = document.getElementById("styleSat");
-  const styleOut   = document.getElementById("styleOut");
-  const toggleRoutes = document.getElementById("toggleRoutes");
-
-  btnLayers.onclick = ()=> layersWrap.classList.toggle("open");
-
-  styleSat.onclick = ()=>{
-    styleSat.classList.add("active");
-    styleOut.classList.remove("active");
-    map.setStyle("mapbox://styles/mapbox/satellite-streets-v12");
-    // Re-add sources/layers after style load
-    map.once("styledata", ()=> rewireAfterStyleChange());
-  };
-  styleOut.onclick = ()=>{
-    styleOut.classList.add("active");
-    styleSat.classList.remove("active");
-    map.setStyle("mapbox://styles/mapbox/outdoors-v12");
-    map.once("styledata", ()=> rewireAfterStyleChange());
-  };
-
-  toggleRoutes.onclick = ()=>{
-    const on = toggleRoutes.classList.toggle("active");
-    toggleRoutes.textContent = on ? "Routes: On" : "Routes: Off";
-    Object.values(layers).forEach(lyrId=>{
-      if(!lyrId) return;
-      const vis = on ? "visible" : "none";
-      if(map.getLayer(lyrId)) map.setLayoutProperty(lyrId, "visibility", vis);
-    });
-  };
-
-  // Mapbox clears custom layers on style change; put them back
-  function rewireAfterStyleChange(){
-    // Re-add nav control (styles reset controls sometimes)
-    // (Mapbox generally keeps controls; safe to ignore)
-
-    // Re-add all routes
-    (async()=>{
-      for(const h of hikes){
-        // if layer exists in this style, skip; else add again
-        const exists = map.getLayer(layers[h.id] || "");
-        if(!exists){
-          // re-add source+layer
-          sources[h.id] = null;
-          layers[h.id]  = null;
-          await addRoute(h);
-        }
-      }
-    })();
-  }
+  // OPTIONAL: clustering (useful only if you have many markers close together).
+  // With a handful of hikes you don’t need this. If you later have dozens,
+  // move markers into a GeoJSON source with "cluster: true" and show cluster circles.
+  // Happy to wire that when you have lots of points.
 </script>
 </body>
 </html>
