@@ -5,58 +5,93 @@
   <title>Peak District Hikes Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
-
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-    }
-    #map {
-      position: absolute;
-      inset: 0;
-    }
+    html, body { margin:0; height:100% }
+    #map { position:absolute; inset:0 }
   </style>
 </head>
 <body>
 <div id="map"></div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+<script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
 <script>
   mapboxgl.accessToken = "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
   // ---- EDIT THIS LIST FOR YOUR HIKES ----
   const hikes = [
     {
+      id: "derwent-edge",
       name: "Derwent Edge",
       coords: [-1.694, 53.409],
       hikeUrl: "https://thelostpeak.co.uk/hikes/derwent-edge",
-      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.409,-1.694"
+      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.409,-1.694",
+      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx"
     },
     {
+      id: "crashed-plane",
       name: "The Crashed Plane Hike",
       coords: [-1.8689, 53.4329],
       hikeUrl: "https://thelostpeak.co.uk/hikes/crashed-plane",
-      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689"
+      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
+      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx"
     },
     {
+      id: "kinder-scout",
       name: "Kinder Scout",
       coords: [-1.8743, 53.3832],
       hikeUrl: "https://thelostpeak.co.uk/hikes/kinder-scout",
-      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.3832,-1.8743"
+      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.3832,-1.8743",
+      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx"
     }
   ];
   // ----------------------------------------
 
   const map = new mapboxgl.Map({
     container: "map",
-    style: "mapbox://styles/mapbox/satellite-streets-v12",  // SATELLITE VIEW
+    style: "mapbox://styles/mapbox/satellite-streets-v12",
     center: [-1.78, 53.41],
     zoom: 10
   });
 
   map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
-  map.on("load", () => {
+  // Helpers
+  async function loadGpxAsLine(gpxUrl){
+    const res = await fetch(gpxUrl);
+    if(!res.ok) throw new Error("GPX fetch failed: " + gpxUrl);
+    const text = await res.text();
+    const xml  = new DOMParser().parseFromString(text, "application/xml");
+    const gj   = toGeoJSON.gpx(xml);
+    // grab first LineString found
+    const line = gj.features.find(f => f.geometry && f.geometry.type === "LineString");
+    if(!line) throw new Error("No LineString in GPX: " + gpxUrl);
+    return line;
+  }
+
+  function addRouteLayer(id, lineFeature){
+    const sourceId = `route-src-${id}`;
+    const layerId  = `route-lyr-${id}`;
+    if(!map.getSource(sourceId)){
+      map.addSource(sourceId, { type:"geojson", data: lineFeature });
+    }
+    if(!map.getLayer(layerId)){
+      map.addLayer({
+        id: layerId,
+        type: "line",
+        source: sourceId,
+        paint: {
+          "line-color": "#EC2629",
+          "line-width": 4,
+          "line-opacity": 0.95
+        }
+      });
+    }
+    return { sourceId, layerId };
+  }
+
+  map.on("load", async () => {
+    // Markers + popups
     hikes.forEach(h => {
       const popupHtml = `
         <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-size:14px;">
@@ -69,14 +104,32 @@
           </div>
         </div>
       `;
-
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml);
-
       new mapboxgl.Marker({ color: "#EC2629" })
         .setLngLat(h.coords)
         .setPopup(popup)
         .addTo(map);
     });
+
+    // Load all GPX routes, add layers, and fit bounds to markers + routes
+    const bounds = new mapboxgl.LngLatBounds();
+    hikes.forEach(h => bounds.extend(h.coords)); // include marker positions
+
+    await Promise.all(hikes.map(async h => {
+      if(!h.gpx) return;
+      try{
+        const line = await loadGpxAsLine(h.gpx);
+        addRouteLayer(h.id, line);
+        // extend bounds to include full route
+        const coords = line.geometry.coordinates;
+        coords.forEach(c => bounds.extend(c));
+      }catch(e){
+        // fail silently for a single route
+        console.warn(e.message || e);
+      }
+    }));
+
+    map.fitBounds(bounds, { padding: 40 });
   });
 </script>
 </body>
