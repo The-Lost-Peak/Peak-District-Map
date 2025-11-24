@@ -35,7 +35,7 @@
 
     .popup-heading {
       font-weight:700;
-      font-size:15px;
+      font-size:14px; /* reduced */
       line-height:1.35;
       margin-bottom:6px;
       color:#1E1E1E;
@@ -49,7 +49,7 @@
       font-size:13px;
       display:flex;
       flex-direction:column;
-      align-items:center; /* centres block */
+      align-items:center;
     }
 
     .spec-row {
@@ -57,7 +57,7 @@
       align-items:center;
       gap:6px;
       margin:2px 0;
-      width:max-content; /* keeps left justified */
+      width:max-content;
     }
 
     .icon {
@@ -77,7 +77,7 @@
       display:flex;
       gap:14px;
       justify-content:center;
-      margin-top:8px;
+      margin-top:14px; /* larger gap below 145m */
     }
     .popup-link {
       color:#3899EC;
@@ -106,7 +106,7 @@ const hikes = [
     hikeUrl:"https://thelostpeak.co.uk/hikes/derwent-edge",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
-    specs:{ duration:"3 to 4 hours", length:"7.4 miles", type:"Circular", ascent:"367m" }
+    specs:{ duration:"3 to 4 hours", length:"7.4 miles", ascent:"367m" }
   },
   {
     id:"crashed-plane",
@@ -115,7 +115,7 @@ const hikes = [
     hikeUrl:"https://thelostpeak.co.uk/hikes/crashed-plane",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
-    specs:{ duration:"2 to 3 hours", length:"3.6 miles", type:"Circular", ascent:"145m" }
+    specs:{ duration:"2 to 3 hours", length:"3.6 miles", ascent:"145m" }
   },
   {
     id:"kinder-scout",
@@ -124,7 +124,7 @@ const hikes = [
     hikeUrl:"https://thelostpeak.co.uk/hikes/kinder-scout",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx",
-    specs:{ duration:"4 to 6 hours", length:"8.3 miles", type:"Circular", ascent:"562m" }
+    specs:{ duration:"4 to 6 hours", length:"8.3 miles", ascent:"562m" }
   }
 ];
 
@@ -175,7 +175,6 @@ function setHovered(id){
 const icons={
   clock:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
-  loop:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a7 7 0 0 1 12-4"/><polyline points="15 3 15 8 20 8"/><path d="M21 12a7 7 0 0 1-12 4"/><polyline points="9 21 9 16 4 16"/></svg>`,
   ascent:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`
 };
 
@@ -184,7 +183,6 @@ function specsHTML(s,urls){
     <div class="specs">
       <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
       <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
-      <div class="spec-row">${icons.loop}<span class="spec-value">${s.type}</span></div>
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
 
       <div class="popup-actions">
@@ -214,7 +212,7 @@ async function loadGpx(gpxUrl){
   const res=await fetch(gpxUrl);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
   const gj=toGeoJSON.gpx(xml);
-  return gj.features.find(f=>f.geometry.type==="LineString");
+  return gj.features.find(f=>f.geometry && f.geometry.type==="LineString");
 }
 
 function addRoute(id,line){
@@ -224,7 +222,14 @@ function addRoute(id,line){
   if(!map.getLayer(lyr)){
     map.addLayer({
       id:lyr,type:"line",source:src,
-      paint:{ "line-color":RED,"line-width":4,"line-opacity":0.95 }
+      paint:{
+        "line-color":RED,
+        "line-width":4,
+        "line-opacity":0.95,
+        /* instant highlight */
+        "line-color-transition": { duration: 0, delay: 0 },
+        "line-width-transition": { duration: 0, delay: 0 }
+      }
     });
   }
   routeLayerId[id]=lyr;
@@ -262,7 +267,8 @@ map.on("load", async () => {
     } catch(e){}
   }
 
-  map.fitBounds(bounds,{padding:80});
+  /* zoom out more */
+  map.fitBounds(bounds,{padding:120});
 });
 </script>
 </body>
