@@ -8,6 +8,15 @@
   <style>
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
+
+    /* hover colours + pointer */
+    .cursor-pointer { cursor: pointer !important; }
+    .marker-elm {
+      width:22px; height:22px; border-radius:50%;
+      background:#EC2629; box-shadow:0 0 8px rgba(0,0,0,.35);
+      transition:background .15s, transform .15s;
+    }
+    .marker-elm.blue { background:#3899EC !important; transform:translateY(-1px); }
   </style>
 </head>
 <body>
@@ -18,12 +27,12 @@
 <script>
   mapboxgl.accessToken = "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
-  // ---- HIKES (Derwent Edge updated again) ----
+  // ---- HIKES ----
   const hikes = [
     {
       id: "derwent-edge",
       name: "Derwent Edge",
-      coords: [-1.7427849606990842, 53.400582126300236],  // UPDATED
+      coords: [-1.7427849606990842, 53.400582126300236],
       hikeUrl: "https://thelostpeak.co.uk/hikes/derwent-edge",
       directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
       gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx"
@@ -45,7 +54,10 @@
       gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx"
     }
   ];
-  // -------------------------------------------------------------
+  // ---------------
+
+  const RED = "#EC2629";
+  const BLUE = "#3899EC";
 
   const map = new mapboxgl.Map({
     container: "map",
@@ -56,6 +68,12 @@
 
   map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
+  // Storage to link markers <-> layers
+  const markerEls = {};        // id -> HTMLElement (the colored dot)
+  const popupById = {};        // id -> Popup
+  const routeLayerId = {};     // id -> line layer id
+
+  // Helpers
   async function loadGpxAsLine(gpxUrl){
     const res = await fetch(gpxUrl);
     if(!res.ok) throw new Error("GPX fetch failed: " + gpxUrl);
@@ -70,6 +88,7 @@
   function addRouteLayer(id, lineFeature){
     const sourceId = `route-src-${id}`;
     const layerId  = `route-lyr-${id}`;
+
     if(!map.getSource(sourceId)){
       map.addSource(sourceId, { type:"geojson", data: lineFeature });
     }
@@ -79,12 +98,42 @@
         type: "line",
         source: sourceId,
         paint: {
-          "line-color": "#EC2629",
+          "line-color": RED,
           "line-width": 4,
           "line-opacity": 0.95
         }
       });
     }
+    routeLayerId[id] = layerId;
+    return { sourceId, layerId };
+  }
+
+  function highlightOn(id){
+    // route to blue
+    const lyr = routeLayerId[id];
+    if(lyr && map.getLayer(lyr)){
+      map.setPaintProperty(lyr, "line-color", BLUE);
+      map.setPaintProperty(lyr, "line-width", 5);
+    }
+    // marker to blue
+    const el = markerEls[id];
+    if(el) el.classList.add("blue");
+
+    map.getCanvas().classList.add("cursor-pointer");
+  }
+
+  function highlightOff(id){
+    // route back to red
+    const lyr = routeLayerId[id];
+    if(lyr && map.getLayer(lyr)){
+      map.setPaintProperty(lyr, "line-color", RED);
+      map.setPaintProperty(lyr, "line-width", 4);
+    }
+    // marker back to red
+    const el = markerEls[id];
+    if(el) el.classList.remove("blue");
+
+    map.getCanvas().classList.remove("cursor-pointer");
   }
 
   map.on("load", async () => {
@@ -101,24 +150,41 @@
           </div>
         </div>
       `;
-      new mapboxgl.Marker({ color: "#EC2629" })
+
+      const el = document.createElement("div");
+      el.className = "marker-elm";
+      el.addEventListener("mouseenter", () => highlightOn(h.id));
+      el.addEventListener("mouseleave", () => highlightOff(h.id));
+
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml);
+      new mapboxgl.Marker(el)
         .setLngLat(h.coords)
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
+        .setPopup(popup)
         .addTo(map);
+
+      markerEls[h.id] = el;
+      popupById[h.id] = popup;
     });
 
     // Fit bounds around markers + GPX routes
     const bounds = new mapboxgl.LngLatBounds();
     hikes.forEach(h => bounds.extend(h.coords));
 
+    // Add routes and attach hover to each route layer
     await Promise.all(hikes.map(async h => {
       if(!h.gpx) return;
       try{
         const line = await loadGpxAsLine(h.gpx);
-        addRouteLayer(h.id, line);
+        const { layerId } = addRouteLayer(h.id, line);
+
+        // include route in bounds
         line.geometry.coordinates.forEach(c => bounds.extend(c));
+
+        // per-route hover -> highlight only this route + its marker
+        map.on("mouseenter", layerId, () => highlightOn(h.id));
+        map.on("mouseleave", layerId, () => highlightOff(h.id));
       }catch(e){
-        console.warn(e);
+        console.warn(e.message || e);
       }
     }));
 
