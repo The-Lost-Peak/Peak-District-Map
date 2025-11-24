@@ -31,39 +31,40 @@
 
     .mapboxgl-popup-close-button { color: #333 !important; }
 
-    /* Popup arrow back to white + slight overlap to avoid seam */
+    /* Arrow white + slight overlap to avoid seam */
     .mapboxgl-popup-tip {
       border-top-color: #fff !important;
       border-bottom-color: #fff !important;
       margin-top: -2px;
     }
 
-    /* Heading: capitalised (not all caps) and slightly smaller */
+    /* Title: centred and split to max 2 words per line (handled in JS with <br>) */
     .popup-heading {
       font-weight: 700;
-      font-size: 15px;
+      font-size: 15px;    /* slightly smaller */
       line-height: 1.35;
       margin-bottom: 6px;
       color: #1E1E1E;
       text-transform: none;
+      text-align: center;
     }
 
-    /* Specs block styles (capitalised text, no all-caps) */
-    .specs { margin-top: 8px; text-align: left; font-size: 13px; }
-    .spec-row { margin: 6px 0; letter-spacing: 0.2px; }
+    /* Specs block styles (reduced spacing) */
+    .specs { margin-top: 6px; text-align: left; font-size: 13px; }
+    .spec-row { margin: 2px 0; letter-spacing: 0.2px; }  /* tighter */
     .spec-label { font-weight: 800; color: #1E1E1E; margin-right: 4px; text-transform: none; }
     .spec-value { font-weight: 800; color: #EC2629; text-transform: none; }
-    .stars { display: inline-block; line-height: 1; font-size: 16px; margin-top: 2px; }
+    .stars { display: inline-block; line-height: 1; font-size: 16px; vertical-align: -1px; }
     .star { color: #EC2629; }
     .star.off { color: rgba(236,38,41,0.25); }
 
-    /* Bottom action links on one line */
+    /* Bottom action links on one line at the bottom */
     .popup-actions {
       display: flex;
       gap: 14px;
       justify-content: center;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .popup-link {
       color: #3899EC;
@@ -220,13 +221,23 @@
     `;
   }
 
+  /* Title wrapper: insert <br> after every 2 words so max two words per line */
+  function wrapTitleTwoWordsPerLine(name){
+    const words = name.trim().split(/\s+/);
+    const lines = [];
+    for (let i = 0; i < words.length; i += 2){
+      lines.push(words.slice(i, i + 2).join(' '));
+    }
+    return lines.join('<br>');
+  }
+
   // helper to build popup with actions at bottom on one line
   function popupHtmlFor(h){
     // inject real urls for the bottom actions
     const specsWithLinks = { ...h.specs, hikeUrlPlaceholder: h.hikeUrl, directionsUrlPlaceholder: h.directionsUrl };
     return `
       <div>
-        <div class="popup-heading">${h.name}</div>
+        <div class="popup-heading">${wrapTitleTwoWordsPerLine(h.name)}</div>
         ${specsHTML(specsWithLinks)}
       </div>
     `;
