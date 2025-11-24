@@ -25,6 +25,7 @@
       padding:12px 14px !important;
       max-width:260px;
       width:max-content;
+      position:relative;
     }
 
     .mapboxgl-popup-tip {
@@ -33,7 +34,14 @@
       margin-top:-2px;
     }
 
-    .mapboxgl-popup-close-button { color:#333 !important; }
+    /* CLOSE BUTTON IMPROVED */
+    .mapboxgl-popup-close-button {
+      color:#333 !important;
+      font-size:22px !important;          /* larger */
+      top:6px !important;                 /* moved down */
+      right:8px !important;               /* moved left */
+      padding:2px 4px !important;
+    }
 
     .popup-heading {
       font-weight:700;
@@ -76,7 +84,7 @@
 
     .popup-actions {
       display:flex;
-      gap:6px;               /* tight "Hike Page & Directions" */
+      gap:6px;
       justify-content:center;
       align-items:center;
       margin-top:10px;
@@ -89,7 +97,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Nuke any focus ring/outline on the links inside popups */
+    /* Remove focus rings */
     .popup-link:focus,
     .popup-link:focus-visible,
     .popup-link:active,
@@ -107,6 +115,7 @@
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
+
 <script>
 mapboxgl.accessToken =
 "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
@@ -206,9 +215,9 @@ function specsHTML(s,urls){
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
 
       <div class="popup-actions">
-        <a class="popup-link" tabindex="-1" href="${urls.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
+        <a class="popup-link" tabindex="-1" href="${urls.hikeUrl}" target="_blank">Hike Page</a>
         <span style="font-weight:800;">&amp;</span>
-        <a class="popup-link" tabindex="-1" href="${urls.directionsUrl}" target="_blank" rel="noopener">Directions</a>
+        <a class="popup-link" tabindex="-1" href="${urls.directionsUrl}" target="_blank">Directions</a>
       </div>
     </div>`;
 }
