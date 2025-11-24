@@ -5,73 +5,67 @@
   <title>Peak District Hikes Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
-
   <style>
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
-    /* Popup box (now white) */
+    /* Strong, clear shadow around popup (box + arrow) */
+    .mapboxgl-popup {
+      filter: drop-shadow(0 12px 28px rgba(0,0,0,0.45));
+    }
+
+    /* Popup box */
     .mapboxgl-popup-content {
-      background: white !important;
-      color: black;
-      border-radius: 10px !important;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.35) !important;
+      background: #fff !important;
+      color: #1E1E1E;
+      border-radius: 12px !important;
+      border: none !important;            /* prevent hairline seam */
+      box-shadow: none !important;         /* shadow handled by parent for seamless arrow */
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       padding: 12px 14px !important;
       text-align: center;
+      max-width: 260px;                    /* wrap long titles */
+      width: max-content;
+      word-wrap: break-word;
     }
 
     .mapboxgl-popup-close-button {
       color: #333 !important;
     }
 
-    /* Popup arrow now white */
+    /* Popup arrow (match white background and remove seam) */
     .mapboxgl-popup-tip {
-      border-top-color: white !important;
-      border-bottom-color: white !important;
+      border-top-color: #fff !important;
+      border-bottom-color: #fff !important;
+      margin-top: -1px; /* overlap to hide any antialias gap */
     }
 
     .popup-heading {
-      font-weight: 700;
-      font-size: 15px;
+      font-weight: 800;
+      font-size: 16px;
+      line-height: 1.2;
       margin-bottom: 6px;
-      color: #EC2629;
+      color: #1E1E1E;  /* title colour per request */
     }
 
     .popup-link {
       color: #3899EC;
       text-decoration: none;
       font-weight: 600;
-    }
-
-    #resetViewBtn {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      z-index: 10;
-      background: #EC2629;
-      color: white;
-      border: none;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-      font-size: 14px;
+      display: inline-block;
+      margin: 2px 0;
     }
   </style>
 </head>
 <body>
 <div id="map"></div>
-<button id="resetViewBtn">Reset</button>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
-
 <script>
-  mapboxgl.accessToken =
-    "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
+  mapboxgl.accessToken = "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
-  const RED = "#EC2629";
+  const RED  = "#EC2629";
   const BLUE = "#3899EC";
 
   const hikes = [
@@ -80,8 +74,7 @@
       name: "Derwent Edge",
       coords: [-1.7427849606990842, 53.400582126300236],
       hikeUrl: "https://thelostpeak.co.uk/hikes/derwent-edge",
-      directionsUrl:
-        "https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
+      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
       gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx"
     },
     {
@@ -89,8 +82,7 @@
       name: "The Crashed Plane Hike",
       coords: [-1.8689, 53.4329],
       hikeUrl: "https://thelostpeak.co.uk/hikes/crashed-plane",
-      directionsUrl:
-        "https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
+      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
       gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx"
     },
     {
@@ -98,8 +90,7 @@
       name: "Kinder Scout",
       coords: [-1.8151209383535991, 53.364872107766416],
       hikeUrl: "https://thelostpeak.co.uk/hikes/kinder-scout",
-      directionsUrl:
-        "https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
+      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
       gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx"
     }
   ];
@@ -117,91 +108,63 @@
   const markerElsById = {};
   const routeLayerId = {};
 
+  // unified hover batch for simultaneous marker + route highlight
   let hoveredId = null;
   let rafToken = null;
 
-  let activeRouteId = null;
-  let prevView = null;
-  const allBounds = new mapboxgl.LngLatBounds();
-
-  function setMarkerColor(id, color) {
+  function setMarkerColor(id, color){
     const el = markerElsById[id];
-    if (!el) return;
-    const svg = el.querySelector("svg");
-    if (svg) svg.style.fill = color;
-    const path = el.querySelector("svg path");
-    if (path) path.setAttribute("fill", color);
+    if(!el) return;
+    const svg = el.querySelector('svg');
+    if(svg) svg.style.fill = color;
+    const path = el.querySelector('svg path');
+    if(path) path.setAttribute('fill', color);
   }
 
-  function setRouteColor(id, color) {
+  function setRouteColor(id, color){
     const lyr = routeLayerId[id];
-    if (lyr && map.getLayer(lyr)) {
+    if(lyr && map.getLayer(lyr)){
       map.setPaintProperty(lyr, "line-color", color);
     }
   }
 
-  function applyHoverState() {
+  function applyHoverState(){
     rafToken = null;
     Object.keys(routeLayerId).forEach(id => setRouteColor(id, RED));
     Object.keys(markerElsById).forEach(id => setMarkerColor(id, RED));
-
-    if (hoveredId) {
+    if(hoveredId){
       setRouteColor(hoveredId, BLUE);
       setMarkerColor(hoveredId, BLUE);
       map.getCanvas().style.cursor = "pointer";
-    } else {
+    }else{
       map.getCanvas().style.cursor = "";
     }
   }
 
-  function setHovered(idOrNull) {
+  function setHovered(idOrNull){
     hoveredId = idOrNull;
-    if (!rafToken) rafToken = requestAnimationFrame(applyHoverState);
+    if(!rafToken) rafToken = requestAnimationFrame(applyHoverState);
   }
 
-  function snapshotView() {
-    const c = map.getCenter();
-    prevView = {
-      center: [c.lng, c.lat],
-      zoom: map.getZoom(),
-      bearing: map.getBearing(),
-      pitch: map.getPitch()
-    };
-  }
-
-  function resetView() {
-    if (prevView) {
-      map.easeTo(prevView);
-    } else {
-      map.fitBounds(allBounds, { padding: 40 });
-    }
-    activeRouteId = null;
-  }
-
-  document.getElementById("resetViewBtn").onclick = resetView;
-
-  map.getCanvas().setAttribute("tabindex", "0");
-  map.getCanvas().addEventListener("keydown", e => {
-    if (e.key === "Escape") resetView();
-  });
-
-  async function loadGpxAsLine(gpxUrl) {
+  async function loadGpxAsLine(gpxUrl){
     const res = await fetch(gpxUrl);
+    if(!res.ok) throw new Error("GPX fetch failed: " + gpxUrl);
     const text = await res.text();
-    const xml = new DOMParser().parseFromString(text, "application/xml");
-    const gj = toGeoJSON.gpx(xml);
-    return gj.features.find(f => f.geometry?.type === "LineString");
+    const xml  = new DOMParser().parseFromString(text, "application/xml");
+    const gj   = toGeoJSON.gpx(xml);
+    const line = gj.features.find(f => f.geometry && f.geometry.type === "LineString");
+    if(!line) throw new Error("No LineString in GPX: " + gpxUrl);
+    return line;
   }
 
-  function addRouteLayer(id, lineFeature) {
+  function addRouteLayer(id, lineFeature){
     const sourceId = `route-src-${id}`;
-    const layerId = `route-lyr-${id}`;
+    const layerId  = `route-lyr-${id}`;
 
-    if (!map.getSource(sourceId)) {
-      map.addSource(sourceId, { type: "geojson", data: lineFeature });
+    if(!map.getSource(sourceId)){
+      map.addSource(sourceId, { type:"geojson", data: lineFeature });
     }
-
-    if (!map.getLayer(layerId)) {
+    if(!map.getLayer(layerId)){
       map.addLayer({
         id: layerId,
         type: "line",
@@ -215,32 +178,18 @@
         }
       });
     }
-
     routeLayerId[id] = layerId;
-  }
-
-  function wireRouteZoom(h, layerId, coords) {
-    const b = new mapboxgl.LngLatBounds();
-    coords.forEach(c => b.extend(c));
-
-    map.on("click", layerId, () => {
-      if (activeRouteId === h.id) {
-        resetView();
-        return;
-      }
-      snapshotView();
-      activeRouteId = h.id;
-      map.fitBounds(b, { padding: 60, maxZoom: 13 });
-    });
+    return layerId;
   }
 
   map.on("load", async () => {
+    // markers + popups
     hikes.forEach(h => {
       const popupHtml = `
         <div>
           <div class="popup-heading">${h.name}</div>
-          <div><a class="popup-link" href="${h.hikeUrl}" target="_blank">Hike Page</a></div>
-          <div style="margin-top:4px;"><a class="popup-link" href="${h.directionsUrl}" target="_blank">Directions</a></div>
+          <div><a class="popup-link" href="${h.hikeUrl}" target="_blank" rel="noopener">Hike Page</a></div>
+          <div><a class="popup-link" href="${h.directionsUrl}" target="_blank" rel="noopener">Directions</a></div>
         </div>
       `;
 
@@ -256,33 +205,27 @@
 
       el.addEventListener("mouseenter", () => setHovered(h.id));
       el.addEventListener("mouseleave", () => setHovered(null));
-
-      /* MOBILE ONLY: tap marker to centre */
-      el.addEventListener("click", () => {
-        if (window.innerWidth < 700) {
-          map.easeTo({ center: h.coords, zoom: map.getZoom() });
-        }
-      });
-
-      allBounds.extend(h.coords);
     });
 
-    await Promise.all(
-      hikes.map(async h => {
+    const bounds = new mapboxgl.LngLatBounds();
+    hikes.forEach(h => bounds.extend(h.coords));
+
+    // routes
+    await Promise.all(hikes.map(async h => {
+      try{
         const line = await loadGpxAsLine(h.gpx);
-        addRouteLayer(h.id, line);
+        const layerId = addRouteLayer(h.id, line);
+        line.geometry.coordinates.forEach(c => bounds.extend(c));
 
-        const coords = line.geometry.coordinates;
-        coords.forEach(c => allBounds.extend(c));
+        // hover only (no click-zoom)
+        map.on("mouseenter", layerId, () => setHovered(h.id));
+        map.on("mouseleave", layerId, () => setHovered(null));
+      }catch(e){
+        console.warn(e.message || e);
+      }
+    }));
 
-        wireRouteZoom(h, `route-lyr-${h.id}`, coords);
-
-        map.on("mouseenter", `route-lyr-${h.id}`, () => setHovered(h.id));
-        map.on("mouseleave", `route-lyr-${h.id}`, () => setHovered(null));
-      })
-    );
-
-    map.fitBounds(allBounds, { padding: 40 });
+    map.fitBounds(bounds, { padding: 40 });
   });
 </script>
 </body>
