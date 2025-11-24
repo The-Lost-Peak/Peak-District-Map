@@ -14,78 +14,65 @@
     .mapboxgl-popup { filter: drop-shadow(0 14px 28px rgba(0,0,0,0.45)); }
 
     .mapboxgl-popup-content {
-      background: #fff !important;
-      color: #1E1E1E;
-      border-radius: 12px !important;
-      border: none !important;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.35) !important;
-      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
-      padding: 12px 14px !important;
-      text-align: left;
-      max-width: 260px;
-      width: max-content;
-      word-wrap: break-word;
+      background:#fff !important;
+      color:#1E1E1E;
+      border-radius:12px !important;
+      border:none !important;
+      box-shadow:0 10px 24px rgba(0,0,0,0.35) !important;
+      font-family:"Inter", system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
+      padding:12px 14px !important;
+      max-width:260px;
+      width:max-content;
     }
-
-    .mapboxgl-popup-close-button { color: #333 !important; }
 
     .mapboxgl-popup-tip {
-      border-top-color: #fff !important;
-      border-bottom-color: #fff !important;
-      margin-top: -2px;
+      border-top-color:#fff !important;
+      border-bottom-color:#fff !important;
+      margin-top:-2px;
     }
+
+    .mapboxgl-popup-close-button { color:#333 !important; }
 
     .popup-heading {
-      font-weight: 700;
-      font-size: 15px;
-      line-height: 1.35;
-      margin-bottom: 6px;
-      color: #1E1E1E;
-      text-transform: none;
-      text-align: center;
+      font-weight:700;
+      font-size:15px;
+      line-height:1.35;
+      margin-bottom:6px;
+      color:#1E1E1E;
+      text-align:center;
+      text-transform:none;
     }
 
-    /* Specs: tighter spacing and icon + value on one line */
-    .specs { margin-top: 6px; text-align: left; font-size: 13px; }
+    .specs { margin-top:6px; font-size:13px; }
     .spec-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;               /* single-space feel between icon and text */
-      margin: 2px 0;          /* reduced spacing as requested */
-      letter-spacing: 0.2px;
-    }
-    .icon {
-      width: 16px;
-      height: 16px;
-      flex: 0 0 16px;
-      color: #1E1E1E;         /* icon colour */
-    }
-    .spec-value {
-      font-weight: 800;
-      color: #EC2629;
-      text-transform: none;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin:2px 0;
     }
 
-    .stars { display: inline-block; line-height: 1; font-size: 16px; vertical-align: -1px; }
-    .star { color: #EC2629; }
-    .star.off { color: rgba(236,38,41,0.25); }
+    .icon {
+      width:16px;
+      height:16px;
+      flex:0 0 16px;
+      color:#1E1E1E;
+    }
+
+    .spec-value {
+      font-weight:800;
+      color:#EC2629;
+    }
 
     .popup-actions {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      align-items: center;
-      margin-top: 8px;
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      margin-top:8px;
     }
     .popup-link {
-      color: #3899EC;
-      text-decoration: none;
-      font-weight: 600;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .popup-link:focus, .popup-link:focus-visible,
-    .mapboxgl-popup-content a:focus, .mapboxgl-popup-content a:focus-visible {
-      outline: none !important; box-shadow: none !important;
+      color:#3899EC;
+      font-weight:600;
+      text-decoration:none;
     }
   </style>
 </head>
@@ -95,233 +82,178 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
 <script>
-  mapboxgl.accessToken = "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
+mapboxgl.accessToken =
+"pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
-  const RED  = "#EC2629";
-  const BLUE = "#3899EC";
+const RED  = "#EC2629";
+const BLUE = "#3899EC";
 
-  const hikes = [
-    {
-      id: "derwent-edge",
-      name: "Derwent Edge",
-      coords: [-1.7427849606990842, 53.400582126300236],
-      hikeUrl: "https://thelostpeak.co.uk/hikes/derwent-edge",
-      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
-      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
-      specs: { duration: "3 to 4 hours", length: "7.4 miles", type: "Circular", ascent: "367m", difficulty: 3, rating: 4, crowd: "Very Low" }
-    },
-    {
-      id: "crashed-plane",
-      name: "The Crashed Plane Hike",
-      coords: [-1.8689, 53.4329],
-      hikeUrl: "https://thelostpeak.co.uk/hikes/crashed-plane",
-      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
-      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
-      specs: { duration: "2 to 3 hours", length: "3.6 miles", type: "Circular", ascent: "145m", difficulty: 3, rating: 2, crowd: "Very High" }
-    },
-    {
-      id: "kinder-scout",
-      name: "Kinder Scout",
-      coords: [-1.8151209383535991, 53.364872107766416],
-      hikeUrl: "https://thelostpeak.co.uk/hikes/kinder-scout",
-      directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
-      gpx: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx",
-      specs: { duration: "4 to 6 hours", length: "8.3 miles", type: "Circular", ascent: "562m", difficulty: 5, rating: 5, crowd: "Low" }
-    }
-  ];
-
-  const map = new mapboxgl.Map({
-    container: "map",
-    style: "mapbox://styles/mapbox/satellite-streets-v12",
-    center: [-1.78, 53.41],
-    zoom: 10
-  });
-
-  map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
-
-  const markerElsById = {};
-  const routeLayerId = {};
-
-  let hoveredId = null;
-  let rafToken = null;
-
-  function setMarkerColor(id, color){
-    const el = markerElsById[id];
-    if(!el) return;
-    const svg = el.querySelector('svg');
-    if(svg) svg.style.fill = color;
-    const path = el.querySelector('svg path');
-    if(path) path.setAttribute('fill', color);
+const hikes = [
+  {
+    id:"derwent-edge",
+    name:"Derwent Edge",
+    coords:[-1.7427849606990842,53.400582126300236],
+    hikeUrl:"https://thelostpeak.co.uk/hikes/derwent-edge",
+    directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
+    gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
+    specs:{ duration:"3 to 4 hours", length:"7.4 miles", type:"Circular", ascent:"367m" }
+  },
+  {
+    id:"crashed-plane",
+    name:"The Crashed Plane Hike",
+    coords:[-1.8689,53.4329],
+    hikeUrl:"https://thelostpeak.co.uk/hikes/crashed-plane",
+    directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
+    gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
+    specs:{ duration:"2 to 3 hours", length:"3.6 miles", type:"Circular", ascent:"145m" }
+  },
+  {
+    id:"kinder-scout",
+    name:"Kinder Scout",
+    coords:[-1.8151209383535991,53.364872107766416],
+    hikeUrl:"https://thelostpeak.co.uk/hikes/kinder-scout",
+    directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
+    gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx",
+    specs:{ duration:"4 to 6 hours", length:"8.3 miles", type:"Circular", ascent:"562m" }
   }
+];
 
-  function setRouteColor(id, color){
-    const lyr = routeLayerId[id];
-    if(lyr && map.getLayer(lyr)){
-      map.setPaintProperty(lyr, "line-color", color);
-    }
+const map = new mapboxgl.Map({
+  container:"map",
+  style:"mapbox://styles/mapbox/satellite-streets-v12",
+  center:[-1.78,53.41],
+  zoom:10
+});
+
+map.addControl(new mapboxgl.NavigationControl(),"bottom-right");
+
+const markerElsById = {};
+const routeLayerId = {};
+let hoveredId = null;
+let rafToken = null;
+
+function setMarkerColor(id,color){
+  const el = markerElsById[id];
+  if(!el) return;
+  const path = el.querySelector("svg path");
+  if(path) path.setAttribute("fill",color);
+}
+
+function setRouteColor(id,color){
+  const lyr = routeLayerId[id];
+  if(lyr && map.getLayer(lyr)){
+    map.setPaintProperty(lyr,"line-color",color);
   }
+}
 
-  function applyHoverState(){
-    rafToken = null;
-    Object.keys(routeLayerId).forEach(id => setRouteColor(id, RED));
-    Object.keys(markerElsById).forEach(id => setMarkerColor(id, RED));
-    if(hoveredId){
-      setRouteColor(hoveredId, BLUE);
-      setMarkerColor(hoveredId, BLUE);
-      map.getCanvas().style.cursor = "pointer";
-    } else {
-      map.getCanvas().style.cursor = "";
-    }
-  }
+function applyHoverState(){
+  rafToken=null;
+  Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
+  Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
+  if(hoveredId){
+    setRouteColor(hoveredId,BLUE);
+    setMarkerColor(hoveredId,BLUE);
+    map.getCanvas().style.cursor="pointer";
+  } else map.getCanvas().style.cursor="";
+}
 
-  function setHovered(idOrNull){
-    hoveredId = idOrNull;
-    if(!rafToken) rafToken = requestAnimationFrame(applyHoverState);
-  }
+function setHovered(id){
+  hoveredId=id;
+  if(!rafToken) rafToken=requestAnimationFrame(applyHoverState);
+}
 
-  function starsHTML(n){
-    const on = "★".repeat(n);
-    const off = "★".repeat(5-n);
-    return `<span class="stars">${[...on].map(()=>'<span class="star">★</span>').join('')}${[...off].map(()=>'<span class="star off">★</span>').join('')}</span>`;
-  }
+const icons={
+  clock:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
+  length:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
+  loop:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a7 7 0 0 1 12-4"/><polyline points="15 3 15 8 20 8"/><path d="M21 12a7 7 0 0 1-12 4"/><polyline points="9 21 9 16 4 16"/></svg>`,
+  ascent:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`
+};
 
-  /* Inline SVG icons (use currentColor so they follow .icon colour) */
-  const icons = {
-    clock: `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M12 7v6l4 2"></path>
-            </svg>`,
-    length: `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-               <path d="M3 8h18M3 16h18"></path>
-               <path d="M6 8v8M10 8v8M14 8v8M18 8v8"></path>
-             </svg>`,
-    loop: `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-             <path d="M3 12a7 7 0 0 1 12-4"></path>
-             <polyline points="15 3 15 8 20 8"></polyline>
-             <path d="M21 12a7 7 0 0 1-12 4"></path>
-             <polyline points="9 21 9 16 4 16"></polyline>
-           </svg>`,
-    ascent: `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-               <path d="M3 20h18"></path>
-               <path d="M6 18l5-6 4 4 5-7"></path>
-               <path d="M20 7h-5v5"></path>
-             </svg>`,
-    people: `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-               <circle cx="8" cy="8" r="3"></circle>
-               <circle cx="16" cy="8" r="3"></circle>
-               <path d="M2 20c0-3.5 3-6 6-6s6 2.5 6 6"></path>
-               <path d="M10 20c0-2.8 2.2-5 5-5s5 2.2 5 5"></path>
-             </svg>`
-  };
+function specsHTML(s,urls){
+  return `
+    <div class="specs">
+      <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
+      <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
+      <div class="spec-row">${icons.loop}<span class="spec-value">${s.type}</span></div>
+      <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
 
-  function specsHTML(s, urls){
-    return `
-      <div class="specs">
-        <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
-        <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
-        <div class="spec-row">${icons.loop}<span class="spec-value">${s.type}</span></div>
-        <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
-        <div class="spec-row">${/* label replaced by star icons */''}<div class="icon" style="width:0;height:0;"></div><span style="font-weight:800;color:#1E1E1E;margin-right:6px;">Difficulty</span> ${starsHTML(s.difficulty)}</div>
-        <div class="spec-row"><div class="icon" style="width:0;height:0;"></div><span style="font-weight:800;color:#1E1E1E;margin-right:6px;">Our Rating</span> ${starsHTML(s.rating)}</div>
-        <div class="spec-row">${icons.people}<span class="spec-value">${s.crowd}</span></div>
-
-        <div class="popup-actions">
-          <a class="popup-link" href="${urls.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
-          <span aria-hidden="true">•</span>
-          <a class="popup-link" href="${urls.directionsUrl}" target="_blank" rel="noopener">Directions</a>
-        </div>
+      <div class="popup-actions">
+        <a class="popup-link" href="${urls.hikeUrl}" target="_blank">Hike Page</a>
+        <span>•</span>
+        <a class="popup-link" href="${urls.directionsUrl}" target="_blank">Directions</a>
       </div>
-    `;
-  }
+    </div>`;
+}
 
-  function wrapTitleTwoWordsPerLine(name){
-    const words = name.trim().split(/\s+/);
-    const lines = [];
-    for (let i = 0; i < words.length; i += 2){
-      lines.push(words.slice(i, i + 2).join(' '));
-    }
-    return lines.join('<br>');
-  }
+function wrapTitle(name){
+  const w=name.trim().split(/\s+/);
+  const lines=[];
+  for(let i=0;i<w.length;i+=2) lines.push(w.slice(i,i+2).join(" "));
+  return lines.join("<br>");
+}
 
-  function popupHtmlFor(h){
-    return `
-      <div>
-        <div class="popup-heading">${wrapTitleTwoWordsPerLine(h.name)}</div>
-        ${specsHTML(h.specs, {hikeUrl: h.hikeUrl, directionsUrl: h.directionsUrl})}
-      </div>
-    `;
-  }
+function popupHtmlFor(h){
+  return `
+    <div>
+      <div class="popup-heading">${wrapTitle(h.name)}</div>
+      ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
+    </div>`;
+}
 
-  async function loadGpxAsLine(gpxUrl){
-    const res = await fetch(gpxUrl);
-    if(!res.ok) throw new Error("GPX fetch failed: " + gpxUrl);
-    const text = await res.text();
-    const xml  = new DOMParser().parseFromString(text, "application/xml");
-    const gj   = toGeoJSON.gpx(xml);
-    const line = gj.features.find(f => f.geometry && f.geometry.type === "LineString");
-    if(!line) throw new Error("No LineString in GPX: " + gpxUrl);
-    return line;
-  }
+async function loadGpx(gpxUrl){
+  const res=await fetch(gpxUrl);
+  const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
+  const gj=toGeoJSON.gpx(xml);
+  return gj.features.find(f=>f.geometry.type==="LineString");
+}
 
-  function addRouteLayer(id, lineFeature){
-    const sourceId = `route-src-${id}`;
-    const layerId  = `route-lyr-${id}`;
-    if(!map.getSource(sourceId)){
-      map.addSource(sourceId, { type:"geojson", data: lineFeature });
-    }
-    if(!map.getLayer(layerId)){
-      map.addLayer({
-        id: layerId,
-        type: "line",
-        source: sourceId,
-        paint: {
-          "line-color": RED,
-          "line-width": 4,
-          "line-opacity": 0.95,
-          "line-color-transition": { duration: 0, delay: 0 },
-          "line-width-transition": { duration: 0, delay: 0 }
-        }
-      });
-    }
-    routeLayerId[id] = layerId;
-    return layerId;
-  }
-
-  map.on("load", async () => {
-    const bounds = new mapboxgl.LngLatBounds();
-
-    hikes.forEach(h => {
-      const marker = new mapboxgl.Marker({ color: RED })
-        .setLngLat(h.coords)
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtmlFor(h)))
-        .addTo(map);
-
-      bounds.extend(h.coords);
-
-      const el = marker.getElement();
-      el.style.cursor = "pointer";
-      markerElsById[h.id] = el;
-
-      el.addEventListener("mouseenter", () => setHovered(h.id));
-      el.addEventListener("mouseleave", () => setHovered(null));
-
-      el.addEventListener("click", () => {
-        if (window.innerWidth < 700) map.easeTo({ center: h.coords, duration: 400 });
-      });
+function addRoute(id,line){
+  const src=`route-src-${id}`;
+  const lyr=`route-lyr-${id}`;
+  if(!map.getSource(src)) map.addSource(src,{type:"geojson",data:line});
+  if(!map.getLayer(lyr)){
+    map.addLayer({
+      id:lyr,type:"line",source:src,
+      paint:{ "line-color":RED,"line-width":4,"line-opacity":0.95 }
     });
+  }
+  routeLayerId[id]=lyr;
+}
 
-    await Promise.all(hikes.map(async h => {
-      try{
-        const line = await loadGpxAsLine(h.gpx);
-        const layerId = addRouteLayer(h.id, line);
-        line.geometry.coordinates.forEach(c => bounds.extend(c));
-        map.on("mouseenter", layerId, () => setHovered(h.id));
-        map.on("mouseleave", layerId, () => setHovered(null));
-      }catch(e){ console.warn(e.message || e); }
-    }));
+map.on("load", async () => {
+  const bounds=new mapboxgl.LngLatBounds();
 
-    map.fitBounds(bounds, { padding: 80 });
+  hikes.forEach(h=>{
+    const marker=new mapboxgl.Marker({color:RED})
+      .setLngLat(h.coords)
+      .setPopup(new mapboxgl.Popup({offset:25}).setHTML(popupHtmlFor(h)))
+      .addTo(map);
+
+    bounds.extend(h.coords);
+    const el=marker.getElement();
+    markerElsById[h.id]=el;
+
+    el.addEventListener("mouseenter",()=>setHovered(h.id));
+    el.addEventListener("mouseleave",()=>setHovered(null));
+
+    el.addEventListener("click",()=>{
+      if(window.innerWidth<700)
+        map.easeTo({center:h.coords,duration:400});
+    });
   });
+
+  for(const h of hikes){
+    try{
+      const line=await loadGpx(h.gpx);
+      addRoute(h.id,line);
+      line.geometry.coordinates.forEach(c=>bounds.extend(c));
+      map.on("mouseenter",routeLayerId[h.id],()=>setHovered(h.id));
+      map.on("mouseleave",routeLayerId[h.id],()=>setHovered(null));
+    } catch(e){}
+  }
+
+  map.fitBounds(bounds,{padding:80});
+});
 </script>
 </body>
 </html>
