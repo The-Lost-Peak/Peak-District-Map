@@ -5,9 +5,30 @@
   <title>Peak District Hikes Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
+
   <style>
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
+
+    .mapboxgl-popup-content {
+      background: #EC2629 !important;
+      color: white;
+      border-radius: 10px !important;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4) !important;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      padding: 12px 14px !important;
+      text-align: center;
+    }
+
+    .mapboxgl-popup-close-button {
+      color: white !important;
+    }
+
+    .popup-link {
+      color: #3899EC;
+      text-decoration: none;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -15,6 +36,7 @@
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
+
 <script>
   mapboxgl.accessToken = "pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
@@ -61,39 +83,51 @@
   const markerElsById = {};
   const routeLayerId = {};
 
+  let hoveredId = null;
+  let rafToken = null;
+
   function setMarkerColor(id, color){
     const el = markerElsById[id];
     if(!el) return;
-    const svgPath = el.querySelector('svg path');
-    if(svgPath) svgPath.setAttribute('fill', color);
+    const svg = el.querySelector('svg');
+    if(svg) svg.style.fill = color;
+    const path = el.querySelector('svg path');
+    if(path) path.setAttribute('fill', color);
   }
 
-  function highlightOn(id){
+  function setRouteColor(id, color){
     const lyr = routeLayerId[id];
     if(lyr && map.getLayer(lyr)){
-      map.setPaintProperty(lyr, "line-color", BLUE);
+      map.setPaintProperty(lyr, "line-color", color);
     }
-    setMarkerColor(id, BLUE);
-    map.getCanvas().style.cursor = "pointer";
   }
-  function highlightOff(id){
-    const lyr = routeLayerId[id];
-    if(lyr && map.getLayer(lyr)){
-      map.setPaintProperty(lyr, "line-color", RED);
+
+  function applyHoverState(){
+    rafToken = null;
+
+    Object.keys(routeLayerId).forEach(id => setRouteColor(id, RED));
+    Object.keys(markerElsById).forEach(id => setMarkerColor(id, RED));
+
+    if(hoveredId){
+      setRouteColor(hoveredId, BLUE);
+      setMarkerColor(hoveredId, BLUE);
+      map.getCanvas().style.cursor = "pointer";
+    } else {
+      map.getCanvas().style.cursor = "";
     }
-    setMarkerColor(id, RED);
-    map.getCanvas().style.cursor = "";
+  }
+
+  function setHovered(idOrNull){
+    hoveredId = idOrNull;
+    if(!rafToken) rafToken = requestAnimationFrame(applyHoverState);
   }
 
   async function loadGpxAsLine(gpxUrl){
     const res = await fetch(gpxUrl);
-    if(!res.ok) throw new Error("GPX fetch failed: " + gpxUrl);
     const text = await res.text();
-    const xml  = new DOMParser().parseFromString(text, "application/xml");
-    const gj   = toGeoJSON.gpx(xml);
-    const line = gj.features.find(f => f.geometry && f.geometry.type === "LineString");
-    if(!line) throw new Error("No LineString in GPX: " + gpxUrl);
-    return line;
+    const xml = new DOMParser().parseFromString(text, "application/xml");
+    const gj = toGeoJSON.gpx(xml);
+    return gj.features.find(f => f.geometry?.type === "LineString");
   }
 
   function addRouteLayer(id, lineFeature){
@@ -103,6 +137,7 @@
     if(!map.getSource(sourceId)){
       map.addSource(sourceId, { type:"geojson", data: lineFeature });
     }
+
     if(!map.getLayer(layerId)){
       map.addLayer({
         id: layerId,
@@ -112,29 +147,27 @@
           "line-color": RED,
           "line-width": 4,
           "line-opacity": 0.95,
-          /* make colour + width changes instantaneous */
           "line-color-transition": { duration: 0, delay: 0 },
           "line-width-transition": { duration: 0, delay: 0 }
         }
       });
     }
+
     routeLayerId[id] = layerId;
-    return layerId;
   }
 
   map.on("load", async () => {
+
+    // markers
     hikes.forEach(h => {
       const popupHtml = `
-        <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-size:14px;">
-          <div style="font-weight:600; margin-bottom:4px;">${h.name}</div>
-          <div style="margin-bottom:2px;">
-            <a href="${h.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
-          </div>
-          <div>
-            <a href="${h.directionsUrl}" target="_blank" rel="noopener">Directions</a>
-          </div>
+        <div>
+          <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${h.name}</div>
+          <div><a class="popup-link" href="${h.hikeUrl}" target="_blank">Hike Page</a></div>
+          <div style="margin-top:4px;"><a class="popup-link" href="${h.directionsUrl}" target="_blank">Directions</a></div>
         </div>
       `;
+
       const marker = new mapboxgl.Marker({ color: RED })
         .setLngLat(h.coords)
         .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
@@ -145,29 +178,29 @@
       el.style.cursor = "pointer";
       markerElsById[h.id] = el;
 
-      el.addEventListener("mouseenter", () => highlightOn(h.id));
-      el.addEventListener("mouseleave", () => highlightOff(h.id));
+      el.addEventListener("mouseenter", () => setHovered(h.id));
+      el.addEventListener("mouseleave", () => setHovered(null));
     });
 
     const bounds = new mapboxgl.LngLatBounds();
     hikes.forEach(h => bounds.extend(h.coords));
 
-    await Promise.all(hikes.map(async h => {
-      if(!h.gpx) return;
-      try{
+    // routes
+    await Promise.all(
+      hikes.map(async h => {
         const line = await loadGpxAsLine(h.gpx);
-        const layerId = addRouteLayer(h.id, line);
+        addRouteLayer(h.id, line);
+
         line.geometry.coordinates.forEach(c => bounds.extend(c));
 
-        map.on("mouseenter", layerId, () => highlightOn(h.id));
-        map.on("mouseleave", layerId, () => highlightOff(h.id));
-      }catch(e){
-        console.warn(e.message || e);
-      }
-    }));
+        map.on("mouseenter", `route-lyr-${h.id}`, () => setHovered(h.id));
+        map.on("mouseleave", `route-lyr-${h.id}`, () => setHovered(null));
+      })
+    );
 
     map.fitBounds(bounds, { padding: 40 });
   });
+
 </script>
 </body>
 </html>
