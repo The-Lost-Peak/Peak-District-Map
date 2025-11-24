@@ -34,13 +34,9 @@
       margin-top:-2px;
     }
 
-    /* Close button (bigger + offset) */
+    /* REMOVE CLOSE BUTTON COMPLETELY */
     .mapboxgl-popup-close-button {
-      color:#333 !important;
-      font-size:22px !important;
-      top:6px !important;
-      right:8px !important;
-      padding:2px 4px !important;
+      display:none !important;
     }
 
     .popup-heading {
@@ -53,7 +49,6 @@
       text-transform:none;
     }
 
-    /* centre the block, keep rows left-justified */
     .specs {
       margin-top:6px;
       font-size:13px;
@@ -85,7 +80,7 @@
 
     .popup-actions {
       display:flex;
-      gap:6px;               /* tight “Hike Page & Directions” */
+      gap:6px;
       justify-content:center;
       align-items:center;
       margin-top:10px;
@@ -98,7 +93,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* remove focus rings in popups */
+    /* remove focus rings */
     .popup-link:focus,
     .popup-link:focus-visible,
     .popup-link:active,
@@ -111,6 +106,7 @@
     }
   </style>
 </head>
+
 <body>
 <div id="map"></div>
 
@@ -216,7 +212,7 @@ function specsHTML(s,urls){
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
 
       <div class="popup-actions">
-        <a class="popup-link" tabindex="-1" href="${urls.hikeUrl}" target="_blank">Hike Page</a>
+        <a class="popup-link" tabindex="-1" href="${urls.hikeUrl}" target="_blank">Hike</a>
         <span style="font-weight:800;">&amp;</span>
         <a class="popup-link" tabindex="-1" href="${urls.directionsUrl}" target="_blank">Directions</a>
       </div>
@@ -234,7 +230,10 @@ function popupHtmlFor(h){
   return `
     <div>
       <div class="popup-heading">${wrapTitle(h.name)}</div>
-      ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
+      ${specsHTML(h.specs,{
+        hikeUrl:h.hikeUrl,
+        directionsUrl:h.directionsUrl
+      })}
     </div>`;
 }
 
