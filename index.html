@@ -19,60 +19,62 @@
       background: #fff !important;
       color: #1E1E1E;
       border-radius: 12px !important;
-      border: 3px solid #EC2629 !important;   /* red border */
+      border: none !important;                 /* no red border */
       box-shadow: 0 10px 24px rgba(0,0,0,0.35) !important;
       font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
       padding: 12px 14px !important;
-      text-align: left;                        /* match reference style */
-      max-width: 260px;                        /* wrap long titles */
+      text-align: left;
+      max-width: 260px;
       width: max-content;
       word-wrap: break-word;
     }
 
     .mapboxgl-popup-close-button { color: #333 !important; }
 
-    /* Popup arrow (brand red) + overlap to remove seam */
+    /* Popup arrow back to white + slight overlap to avoid seam */
     .mapboxgl-popup-tip {
-      border-top-color: #EC2629 !important;
-      border-bottom-color: #EC2629 !important;
+      border-top-color: #fff !important;
+      border-bottom-color: #fff !important;
       margin-top: -2px;
     }
 
+    /* Heading: capitalised (not all caps) and slightly smaller */
     .popup-heading {
       font-weight: 700;
-      font-size: 15px;       /* slightly smaller */
+      font-size: 15px;
       line-height: 1.35;
       margin-bottom: 6px;
       color: #1E1E1E;
-      text-transform: none;  /* capitalised, not ALL CAPS */
+      text-transform: none;
     }
 
+    /* Specs block styles (capitalised text, no all-caps) */
+    .specs { margin-top: 8px; text-align: left; font-size: 13px; }
+    .spec-row { margin: 6px 0; letter-spacing: 0.2px; }
+    .spec-label { font-weight: 800; color: #1E1E1E; margin-right: 4px; text-transform: none; }
+    .spec-value { font-weight: 800; color: #EC2629; text-transform: none; }
+    .stars { display: inline-block; line-height: 1; font-size: 16px; margin-top: 2px; }
+    .star { color: #EC2629; }
+    .star.off { color: rgba(236,38,41,0.25); }
+
+    /* Bottom action links on one line */
+    .popup-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
     .popup-link {
       color: #3899EC;
       text-decoration: none;
       font-weight: 600;
-      display: inline-block;
-      margin: 4px 0 2px;
       -webkit-tap-highlight-color: transparent;
     }
-    /* remove first-click focus box */
     .popup-link:focus, .popup-link:focus-visible,
     .mapboxgl-popup-content a:focus, .mapboxgl-popup-content a:focus-visible {
       outline: none !important; box-shadow: none !important;
     }
-
-    /* Specs block styles */
-    .specs {
-      margin-top: 8px;
-      text-align: left;
-      font-size: 13px;
-    }
-    .spec-row { margin: 6px 0; letter-spacing: 0.2px; }
-    .spec-label { font-weight: 800; color: #1E1E1E; margin-right: 4px; text-transform: uppercase; }
-    .spec-value { font-weight: 800; color: #EC2629; text-transform: uppercase; }
-    .stars { display: inline-block; line-height: 1; font-size: 16px; margin-top: 2px; }
-    .star { color: #EC2629; }
-    .star.off { color: rgba(236,38,41,0.25); }
   </style>
 </head>
 <body>
@@ -86,7 +88,7 @@
   const RED  = "#EC2629";
   const BLUE = "#3899EC";
 
-  /* Hike data + popup specs */
+  /* Hike data + popup specs (capitalised text, not all caps) */
   const hikes = [
     {
       id: "derwent-edge",
@@ -207,6 +209,25 @@
         <div class="spec-row"><span class="spec-label">Difficulty:</span> ${starsHTML(s.difficulty)}</div>
         <div class="spec-row"><span class="spec-label">Our Rating:</span> ${starsHTML(s.rating)}</div>
         <div class="spec-row"><span class="spec-label">Crowd Levels:</span> <span class="spec-value">${s.crowd}</span></div>
+
+        <!-- bottom actions on one line -->
+        <div class="popup-actions">
+          <a class="popup-link" href="${s.hikeUrlPlaceholder || '#'}" target="_blank" rel="noopener">Hike Page</a>
+          <span aria-hidden="true">•</span>
+          <a class="popup-link" href="${s.directionsUrlPlaceholder || '#'}" target="_blank" rel="noopener">Directions</a>
+        </div>
+      </div>
+    `;
+  }
+
+  // helper to build popup with actions at bottom on one line
+  function popupHtmlFor(h){
+    // inject real urls for the bottom actions
+    const specsWithLinks = { ...h.specs, hikeUrlPlaceholder: h.hikeUrl, directionsUrlPlaceholder: h.directionsUrl };
+    return `
+      <div>
+        <div class="popup-heading">${h.name}</div>
+        ${specsHTML(specsWithLinks)}
       </div>
     `;
   }
@@ -252,18 +273,9 @@
     const bounds = new mapboxgl.LngLatBounds();
 
     hikes.forEach(h => {
-      const popupHtml = `
-        <div>
-          <div class="popup-heading">${h.name}</div>
-          <div><a class="popup-link" href="${h.hikeUrl}" target="_blank" rel="noopener">Hike Page</a></div>
-          <div><a class="popup-link" href="${h.directionsUrl}" target="_blank" rel="noopener">Directions</a></div>
-          ${specsHTML(h.specs)}
-        </div>
-      `;
-
       const marker = new mapboxgl.Marker({ color: RED })
         .setLngLat(h.coords)
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtmlFor(h)))
         .addTo(map);
 
       bounds.extend(h.coords);
@@ -298,7 +310,6 @@
       }
     }));
 
-    // zoomed out slightly more
     map.fitBounds(bounds, { padding: 80 });
   });
 </script>
