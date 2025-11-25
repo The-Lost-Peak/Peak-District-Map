@@ -15,15 +15,16 @@
     .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
     .mapboxgl-popup-tip{ display:none !important }
 
+    /* IMPORTANT: remove Mapbox default 240px cap */
     .mapboxgl-popup-content{
       background:transparent !important;
       border:none !important;
       padding:0 !important;
       box-shadow:none !important;
-      width:auto;
-      max-width:none;
+      width:auto !important;
+      max-width:none !important;        /* <-- was causing squish */
       overflow:visible !important;
-      display:inline-block;
+      display:inline-block;              /* shrink-wrap container */
       box-sizing:border-box;
       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
     }
@@ -66,9 +67,10 @@
       transform:translateZ(0);
     }
 
+    /* Wider white column */
     .popup-body{
       padding:8px 27px 10px 12px;
-      flex:1 1 300px;   /* WIDENED: was 240px */
+      flex:1 0 300px;                   /* min 300px; can grow */
       text-align:center;
       min-width:0;
       word-break:break-word;
@@ -124,6 +126,7 @@
 
     @media (max-width:440px){
       .img-wrap{ width:120px; flex-basis:120px }
+      .popup-body{ flex-basis:240px }
     }
   </style>
 </head>
