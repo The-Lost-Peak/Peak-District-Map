@@ -13,7 +13,7 @@
     .marker { cursor:pointer !important; }
     .mapboxgl-popup { filter: drop-shadow(0 14px 28px rgba(0,0,0,0.45)); }
 
-    /* Popup as a side-by-side CARD (photo on the LEFT, content on the RIGHT) */
+    /* Popup card with LEFT photo, RIGHT content */
     .mapboxgl-popup-content{
       background:#fff !important;
       color:#1E1E1E;
@@ -21,17 +21,15 @@
       border:none !important;
       box-shadow:0 10px 24px rgba(0,0,0,0.35) !important;
       font-family:"Inter", system-ui,-apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
-      padding:0 !important;                 /* no outer padding so the image can sit flush on the left */
-      max-width:420px;
+      padding:0 !important;
+      max-width:440px;
       width:max-content;
       position:relative;
-      overflow:hidden;                      /* keep rounded corners clean around the image */
+      overflow:hidden; /* keeps the rounded corners tight */
     }
-    .mapboxgl-popup-tip{
-      border-top-color:#fff !important;
-      border-bottom-color:#fff !important;
-      margin-top:-2px;
-    }
+    /* Hide the arrow so the left edge stays perfectly straight */
+    .mapboxgl-popup-tip{ display:none !important; }
+
     .mapboxgl-popup-close-button{
       color:#333 !important;
       font-size:22px !important;
@@ -41,25 +39,24 @@
       z-index:2;
     }
 
-    /* Card layout */
     .popup-card{
       display:flex;
-      align-items:stretch;                  /* image height matches the whole card */
+      align-items:stretch; /* photo matches text column height */
     }
+
+    /* Use a DIV with background-image so it stretches to full card height */
     .popup-img{
-      width:120px;                          /* photo column width */
-      height:100%;
-      object-fit:cover;
-      display:block;
+      width:130px;
+      flex:0 0 130px;
+      background:#eee center/cover no-repeat;
+      border-radius:12px 0 0 12px;
       user-select:none;
       -webkit-user-drag:none;
-      background:#eee;
-      border-radius:12px 0 0 12px;          /* rounded only on the left to match container */
-      flex:0 0 120px;
     }
+
     .popup-body{
-      padding:10px 12px 12px 12px;          /* inner padding for text */
-      min-width:210px;
+      padding:10px 12px 12px 12px;
+      min-width:220px;
     }
 
     .popup-heading{
@@ -68,14 +65,13 @@
       line-height:1.3;
       margin:0 0 6px 0;
       color:#1E1E1E;
-      text-transform:none;
     }
 
     .specs{
       font-size:13px;
       display:flex;
       flex-direction:column;
-      align-items:flex-start;               /* left-aligned rows */
+      align-items:flex-start;
       gap:4px;
     }
     .spec-row{
@@ -95,7 +91,6 @@
       color:#EC2629;
       text-transform:none;
     }
-
     .popup-actions{
       display:flex;
       gap:6px;
@@ -120,8 +115,9 @@
       border:none !important;
     }
 
-    @media (max-width:420px){
-      .popup-img{ width:100px; flex-basis:100px; }
+    @media (max-width:440px){
+      .popup-img{ width:110px; flex-basis:110px; }
+      .popup-body{ min-width:200px; }
     }
   </style>
 </head>
@@ -192,6 +188,7 @@ let rafToken = null;
 function setMarkerColor(id,color){
   const el = markerElsById[id];
   if(!el) return;
+  // Default Mapbox marker uses an inline SVG
   const path = el.querySelector("svg path");
   if(path) path.setAttribute("fill",color);
 }
@@ -231,9 +228,9 @@ function specsHTML(s,urls){
       <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
       <div class="popup-actions">
-        <a class="popup-link" tabindex="-1" href="${urls.hikeUrl}" target="_blank">Hike Page</a>
+        <a class="popup-link" tabindex="-1" href="${urls.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
         <span style="font-weight:800;">&amp;</span>
-        <a class="popup-link" tabindex="-1" href="${urls.directionsUrl}" target="_blank">Directions</a>
+        <a class="popup-link" tabindex="-1" href="${urls.directionsUrl}" target="_blank" rel="noopener">Directions</a>
       </div>
     </div>`;
 }
@@ -246,9 +243,10 @@ function wrapTitle(name){
 }
 
 function popupHtmlFor(h){
+  const safeUrl = h.photo; // already raw GitHub
   return `
     <div class="popup-card">
-      <img class="popup-img" src="${h.photo}" alt="${h.name}">
+      <div class="popup-img" style="background-image:url('${safeUrl}')"></div>
       <div class="popup-body">
         <div class="popup-heading">${wrapTitle(h.name)}</div>
         ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
@@ -290,7 +288,11 @@ map.on("load", async () => {
   hikes.forEach(h=>{
     const marker=new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
-      .setPopup(new mapboxgl.Popup({offset:25}).setHTML(popupHtmlFor(h)))
+      .setPopup(new mapboxgl.Popup({
+        offset:25,            // small gap since we hid the tip
+        closeButton:true,
+        className:"card-popup"
+      }).setHTML(popupHtmlFor(h)))
       .addTo(map);
 
     const el=marker.getElement();
