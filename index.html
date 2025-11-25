@@ -49,9 +49,11 @@
       overflow:hidden;
     }
 
+    /* ↓↓↓ REDUCED HEIGHT 75% ↓↓↓ */
     .img-wrap{
       width:140px;
       flex:0 0 140px;
+      height:70px;                        /* NEW: reduce popup height */
       border-radius:12px 0 0 12px;
       overflow:hidden;
       background:#000;
@@ -64,11 +66,16 @@
       transform:translateZ(0);
     }
 
+    /* White column auto-matches reduced height */
     .popup-body{
       padding:8px 27px 10px 12px;
-      flex:0 0 220px;   /* widened +50px from original */
+      flex:0 0 220px;
       text-align:center;
       min-width:0;
+      height:70px;                         /* Match reduced image height */
+      display:flex;
+      flex-direction:column;
+      justify-content:center;              /* Center vertically */
     }
 
     .popup-heading{
@@ -84,8 +91,9 @@
       font-size:13px;
       display:flex;
       flex-direction:column;
-      gap:4px;
+      gap:2px;
       align-items:center;
+      margin-top:-4px;
     }
     .spec-row{
       display:flex;
@@ -101,21 +109,13 @@
       gap:6px;
       justify-content:center;
       align-items:center;
-      margin-top:8px;
+      margin-top:3px;
     }
     .popup-link{
       color:#3899EC;
       font-weight:600;
       text-decoration:none;
       white-space:nowrap;
-    }
-    .mapboxgl-popup-content a,
-    .mapboxgl-popup-content a:focus,
-    .mapboxgl-popup-content a:active{
-      outline:none !important;
-      box-shadow:none !important;
-      border:none !important;
-      background:transparent !important;
     }
 
     @media (max-width:440px){
@@ -183,19 +183,19 @@ const map = new mapboxgl.Map({
 });
 map.addControl(new mapboxgl.NavigationControl(),"bottom-right");
 
-/* Hover sync — instant, no rAF */
+/* Hover sync */
 const markerElsById = {};
 const routeLayerId  = {};
 let hoveredId = null;
 
 function setMarkerColor(id,color){
-  const el = markerElsById[id];
+  const el=markerElsById[id];
   if(!el) return;
-  const path = el.querySelector("svg path");
+  const path=el.querySelector("svg path");
   if(path) path.setAttribute("fill",color);
 }
 function setRouteColor(id,color){
-  const lyr = routeLayerId[id];
+  const lyr=routeLayerId[id];
   if(lyr && map.getLayer(lyr)){
     map.setPaintProperty(lyr,"line-color",color);
   }
@@ -213,7 +213,7 @@ function applyHoverState(){
 }
 function setHovered(id){
   hoveredId=id;
-  applyHoverState();   // instant update
+  applyHoverState();
 }
 
 /* Icons */
@@ -231,16 +231,16 @@ function specsHTML(s,u){
       <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
       <div class="popup-actions">
-        <a class="popup-link" href="${u.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
+        <a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a>
         <span style="font-weight:800;">&amp;</span>
-        <a class="popup-link" href="${u.directionsUrl}" target="_blank" rel="noopener">Directions</a>
+        <a class="popup-link" href="${u.directionsUrl}" target="_blank">Directions</a>
       </div>
     </div>`;
 }
 function popupHtmlFor(h){
   return `
     <div class="popup-card">
-      <div class="img-wrap"><img src="${h.photo}" alt="${h.name}"></div>
+      <div class="img-wrap"><img src="${h.photo}"></div>
       <div class="popup-body">
         <div class="popup-heading">${h.name}</div>
         ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
@@ -268,7 +268,7 @@ function addRoute(id,line){
         "line-color":RED,
         "line-width":4,
         "line-opacity":0.95,
-        "line-color-transition":{duration:0,delay:0},  // ensure instant
+        "line-color-transition":{duration:0,delay:0},
         "line-width-transition":{duration:0,delay:0}
       }
     });
@@ -287,7 +287,6 @@ map.on("load", async () => {
       .addTo(map);
 
     const el=marker.getElement();
-    el.classList.add("marker");
     markerElsById[h.id]=el;
     bounds.extend(h.coords);
 
