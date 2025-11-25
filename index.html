@@ -60,10 +60,10 @@
       box-shadow:none !important;
     }
 
-    /* WHITE SECTION — increased +50px (from ~170 to 220) */
+    /* white section widened +50px */
     .popup-body{
       padding:8px 27px 10px 12px;
-      flex:0 0 220px; /* << widened by +50px */
+      flex:0 0 220px;
       text-align:center;
       min-width:0;
     }
@@ -142,6 +142,7 @@ mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE
 const RED  = "#EC2629";
 const BLUE = "#3899EC";
 
+/* images */
 const IMG = {
   derwent: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/derwent-dam-tower.jpg",
   crashed: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/b29-overexposed-crash-site.jpg",
@@ -181,12 +182,12 @@ const hikes = [
   }
 ];
 
-/* MAP */
+/* map */
 const map = new mapboxgl.Map({
   container:"map",
   style:"mapbox://styles/mapbox/satellite-streets-v12",
   center:[-1.78,53.41],
-  zoom:10      /* <<< MORE ZOOMED IN */
+  zoom:11
 });
 map.addControl(new mapboxgl.NavigationControl(),"bottom-right");
 
@@ -195,20 +196,19 @@ const routeLayerId = {};
 let hoveredId = null;
 let rafToken = null;
 
+/* hover sync */
 function setMarkerColor(id,color){
   const el=markerElsById[id];
   if(!el) return;
   const path=el.querySelector("svg path");
   if(path) path.setAttribute("fill",color);
 }
-
 function setRouteColor(id,color){
   const lyr=routeLayerId[id];
   if(lyr && map.getLayer(lyr)){
     map.setPaintProperty(lyr,"line-color",color);
   }
 }
-
 function applyHoverState(){
   rafToken=null;
   Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
@@ -221,12 +221,12 @@ function applyHoverState(){
     map.getCanvas().style.cursor="";
   }
 }
-
 function setHovered(id){
   hoveredId=id;
   if(!rafToken) rafToken=requestAnimationFrame(applyHoverState);
 }
 
+/* icons */
 const icons={
   clock:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -258,13 +258,13 @@ function popupHtmlFor(h){
     </div>`;
 }
 
+/* gpx */
 async function loadGpx(url){
   const res=await fetch(url);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
   const gj=toGeoJSON.gpx(xml);
   return gj.features.find(f=>f.geometry && f.geometry.type==="LineString");
 }
-
 function addRoute(id,line){
   const src=`route-src-${id}`;
   const lyr=`route-lyr-${id}`;
@@ -280,6 +280,7 @@ function addRoute(id,line){
   routeLayerId[id]=lyr;
 }
 
+/* init */
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
@@ -292,7 +293,6 @@ map.on("load", async () => {
     const el=marker.getElement();
     el.classList.add("marker");
     markerElsById[h.id]=el;
-
     bounds.extend(h.coords);
 
     el.addEventListener("mouseenter",()=>setHovered(h.id));
@@ -312,7 +312,7 @@ map.on("load", async () => {
     }catch(e){}
   }
 
-  map.fitBounds(bounds,{padding:110, maxZoom:10});  /* <<< also zoom in more */
+  map.fitBounds(bounds,{ padding:110, maxZoom:11 });
 });
 </script>
 </body>
