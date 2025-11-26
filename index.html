@@ -72,10 +72,7 @@
       transform:translateZ(0);
     }
 
-    /* tighter line height applied everywhere inside the body */
-    .popup-body *{
-      line-height:1.15;
-    }
+    .popup-body *{ line-height:1.15 }
 
     .popup-body{
       padding:8px 22px 10px 12px;
@@ -93,7 +90,7 @@
     .popup-heading{
       font-weight:800;
       font-size:12px;
-      margin:0 0 4px 0;     /* was 6px */
+      margin:0 0 4px 0;
       color:#1E1E1E;
       white-space:normal;
     }
@@ -102,7 +99,7 @@
       font-size:11px;
       display:flex;
       flex-direction:column;
-      gap:2px;              /* was 4px */
+      gap:2px;
       align-items:center;
     }
 
@@ -110,7 +107,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:4px;              /* was 6px */
+      gap:4px;
     }
 
     .icon{
@@ -129,10 +126,10 @@
     .popup-actions{
       display:flex;
       flex-direction:column;
-      gap:4px;              /* was 6px */
+      gap:4px;
       justify-content:center;
       align-items:center;
-      margin-top:6px;       /* was 8px */
+      margin-top:6px;
       flex-wrap:nowrap;
     }
 
@@ -142,6 +139,12 @@
       text-decoration:none;
       white-space:nowrap;
       font-size:12px;
+    }
+
+    /* Remove black focus box from popup links only */
+    .popup-link:focus{
+      outline:none !important;
+      box-shadow:none !important;
     }
 
     @media (max-width:440px){
@@ -224,12 +227,14 @@ function setMarkerColor(id,color){
   const path = el.querySelector("svg path");
   if(path) path.setAttribute("fill",color);
 }
+
 function setRouteColor(id,color){
   const lyr = routeLayerId[id];
   if(lyr && map.getLayer(lyr)){
     map.setPaintProperty(lyr,"line-color",color);
   }
 }
+
 function applyHoverState(){
   Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
   Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
@@ -241,6 +246,7 @@ function applyHoverState(){
     map.getCanvas().style.cursor="";
   }
 }
+
 function setHovered(id){
   hoveredId=id;
   applyHoverState();
@@ -253,7 +259,7 @@ const icons={
   ascent:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`
 };
 
-/* Popup builder */
+/* Popup builders */
 function specsHTML(s,u){
   return `
     <div class="specs">
@@ -266,6 +272,7 @@ function specsHTML(s,u){
       </div>
     </div>`;
 }
+
 function popupHtmlFor(h){
   return `
     <div class="popup-card">
@@ -284,6 +291,7 @@ async function loadGpx(url){
   const gj=toGeoJSON.gpx(xml);
   return gj.features.find(f=>f.geometry && f.geometry.type==="LineString");
 }
+
 function addRoute(id,line){
   const src=`route-src-${id}`;
   const lyr=`route-lyr-${id}`;
