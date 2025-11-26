@@ -36,16 +36,17 @@
     }
 
     .popup-card{
-      display:flex;
-      align-items:stretch;
-      background:#fff;
-      border-radius:12px;
-      overflow:hidden;
-      width:fit-content;
-      min-width:310px;
-      max-width:360px;
-      height:130px;
-    }
+  display:flex;
+  align-items:stretch;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+  width:fit-content;   /* shrink to content */
+  min-width:auto;      /* allow natural width */
+  max-width:none;      /* no forced max */
+  height:130px;
+}
+
 
     .img-wrap{
       width:140px;
@@ -345,3 +346,4 @@ map.on("load", async () => {
 </script>
 </body>
 </html>
+
