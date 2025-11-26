@@ -11,7 +11,12 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
-    .marker{ cursor:pointer !important }
+    .marker{
+      cursor:pointer !important;
+      transform:scale(0.85);        /* 15% smaller */
+      transform-origin:center;
+    }
+
     .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
     .mapboxgl-popup-tip{ display:none !important }
 
@@ -72,7 +77,7 @@
     }
 
     .popup-body{
-      padding:6px 18px 6px 10px;   /* slightly reduced padding */
+      padding:8px 22px 10px 12px;
       flex:0 0 170px;
       min-width:170px;
       max-width:170px;
@@ -87,8 +92,8 @@
     .popup-heading{
       font-weight:800;
       font-size:12px;
-      line-height:1.2;            /* tighter lines */
-      margin:0 0 4px 0;           /* reduced from 6px */
+      line-height:1.25;
+      margin:0 0 6px 0;
       color:#1E1E1E;
       white-space:normal;
     }
@@ -97,39 +102,33 @@
       font-size:11px;
       display:flex;
       flex-direction:column;
-      gap:2px;                    /* was 4px */
+      gap:4px;
       align-items:center;
     }
-
     .spec-row{
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:4px;                    /* was 6px */
-      line-height:1.1;            /* tighter */
+      gap:6px;
     }
-
-    .icon{ width:14px; height:14px; flex:0 0 14px; color:#1E1E1E }
+    .icon{ width:16px; height:16px; flex:0 0 16px; color:#1E1E1E }
     .spec-value{ font-weight:800; color:#EC2629; font-size:12px; }
 
     .popup-actions{
       display:flex;
-      flex-direction:column;       /* stacked */
-      gap:2px;                     /* was 6px */
+      flex-direction:column;
+      gap:6px;
       justify-content:center;
       align-items:center;
-      margin-top:4px;              /* was 8px */
+      margin-top:8px;
       flex-wrap:nowrap;
-      line-height:1.1;
     }
-
     .popup-link{
       color:#3899EC;
       font-weight:600;
       text-decoration:none;
       white-space:nowrap;
       font-size:12px;
-      line-height:1.1;
     }
 
     @media (max-width:440px){
@@ -219,7 +218,7 @@ function setRouteColor(id,color){
   }
 }
 function applyHoverState(){
-  Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
+  Object.keys.routeLayerId?.forEach(id=>setRouteColor(id,RED));
   Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
   if(hoveredId){
     setRouteColor(hoveredId,BLUE);
