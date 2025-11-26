@@ -15,16 +15,15 @@
     .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
     .mapboxgl-popup-tip{ display:none !important }
 
-    /* keep Mapbox container sizing fluid so the card can be as narrow as we set */
     .mapboxgl-popup-content{
       background:transparent !important;
       border:none !important;
       padding:0 !important;
       box-shadow:none !important;
-      width:auto !important;           /* no forced width */
-      max-width:none !important;       /* remove Mapbox default 240px cap */
+      width:auto !important;
+      max-width:none !important;
       overflow:visible !important;
-      display:block;                   /* block avoids any right-edge clipping */
+      display:block;
       box-sizing:border-box;
       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
     }
@@ -50,9 +49,12 @@
       background:#fff;
       border-radius:12px;
       overflow:hidden;
-      width: fit-content;              /* shrink-wrap to content */
-      min-width: 300px;                /* 140 img + 230 text + padding */
-      max-width: 350px;                /* hard ceiling so it never grows too wide */
+      width:fit-content;
+      min-width:310px;                 /* 140 img + 170 text */
+      max-width:360px;
+
+      /* ADDED: lock the overall height */
+      height:190px;
     }
 
     .img-wrap{
@@ -61,6 +63,9 @@
       border-radius:12px 0 0 12px;
       overflow:hidden;
       background:#000;
+
+      /* ADDED: match parent height */
+      height:100%;
     }
     .img-wrap img{
       display:block;
@@ -72,12 +77,20 @@
 
     .popup-body{
       padding:8px 22px 10px 12px;
-      flex:0 0 230px;                  /* reduced text column width */
-      min-width:140px;                 /* prevents squish that causes overflow */
-      max-width:140px;                 /* locks width so whitespace cannot grow */
+
+      /* widened a touch so text wraps less, helping the fixed height fit */
+      flex:0 0 170px;
+      min-width:170px;
+      max-width:170px;
+
       text-align:center;
       word-break:break-word;
       overflow:visible;
+
+      /* ADDED: vertically center content inside the fixed height */
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
     }
 
     .popup-heading{
@@ -123,8 +136,9 @@
     @media (max-width:440px){
       .img-wrap{ width:120px; flex-basis:120px }
       .popup-card{
-        min-width: 350px;              /* 120 + 230 */
-        max-width: 350px;
+        min-width:290px;               /* 120 + 170 */
+        max-width:320px;
+        height:190px;                  /* keep same fixed height on mobile */
       }
     }
   </style>
@@ -318,7 +332,3 @@ map.on("load", async () => {
 </script>
 </body>
 </html>
-
-
-
-
