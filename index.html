@@ -11,12 +11,7 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
-    .marker{
-      cursor:pointer !important;
-      transform:scale(0.85);        /* 15% smaller */
-      transform-origin:center;
-    }
-
+    .marker{ cursor:pointer !important }
     .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
     .mapboxgl-popup-tip{ display:none !important }
 
@@ -55,7 +50,7 @@
       border-radius:12px;
       overflow:hidden;
       width:fit-content;
-      min-width:310px;
+      min-width:310px;                 /* 140 img + 170 text */
       max-width:360px;
       height:130px;
     }
@@ -116,7 +111,7 @@
 
     .popup-actions{
       display:flex;
-      flex-direction:column;
+      flex-direction:column;           /* stack links vertically */
       gap:6px;
       justify-content:center;
       align-items:center;
@@ -218,7 +213,7 @@ function setRouteColor(id,color){
   }
 }
 function applyHoverState(){
-  Object.keys.routeLayerId?.forEach(id=>setRouteColor(id,RED));
+  Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
   Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
   if(hoveredId){
     setRouteColor(hoveredId,BLUE);
