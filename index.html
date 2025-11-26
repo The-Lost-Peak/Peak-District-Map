@@ -14,7 +14,10 @@
     .marker{ cursor:pointer !important }
 
     /* 15% smaller markers */
-    .marker svg{ transform:scale(0.85); transform-origin:center }
+    .marker svg{
+      transform:scale(0.85);
+      transform-origin:center;
+    }
 
     .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
     .mapboxgl-popup-tip{ display:none !important }
@@ -38,7 +41,7 @@
       background:#fff;
       border-radius:12px;
       overflow:hidden;
-      width:fit-content;   /* shrink to content */
+      width:fit-content;
       min-width:auto;
       max-width:none;
       height:130px;
@@ -61,11 +64,11 @@
     }
 
     .popup-body{
-      box-sizing:border-box;          /* include padding inside the 140px */
+      box-sizing:border-box;
       padding:8px 12px 10px 10px;
-      flex:0 0 140px;                 /* match image width */
-      min-width:140px;
-      max-width:140px;
+      flex:0 0 160px;      /* WAS 140px */
+      min-width:160px;     /* WAS 140px */
+      max-width:160px;     /* WAS 140px */
       text-align:center;
       word-break:break-word;
       overflow:visible;
@@ -77,7 +80,7 @@
 
     .popup-heading{
       font-weight:800;
-      font-size:11px;
+      font-size:13px;
       line-height:1.15;
       margin:0 0 6px 0;
       color:#1E1E1E;
@@ -85,13 +88,12 @@
     }
 
     .specs{
-      font-size:10px;
+      font-size:12px;
       display:flex;
       flex-direction:column;
-      gap:2px;
+      gap:3px;
       align-items:center;
     }
-
     .spec-row{
       display:flex;
       align-items:center;
@@ -100,12 +102,12 @@
     }
 
     .icon{ width:16px; height:16px; flex:0 0 16px; color:#1E1E1E }
-    .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
+    .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
 
     .popup-actions{
       display:flex;
       flex-direction:column;
-      gap:2px;
+      gap:4px;
       justify-content:center;
       align-items:center;
       margin-top:6px;
@@ -113,10 +115,10 @@
 
     .popup-link{
       color:#3899EC;
-      font-weight:800;
+      font-weight:600;
       text-decoration:none;
       white-space:nowrap;
-      font-size:11px;
+      font-size:13px;
       outline:none !important;
       box-shadow:none !important;
       border:none !important;
@@ -130,18 +132,20 @@
     }
 
     @media (max-width:440px){
-      .popup-card{ height:190px }
-      /* image stays 140px on mobile to keep symmetry with text panel */
+      .img-wrap{ width:120px; flex-basis:120px }
+      .popup-card{
+        min-width:290px;
+        max-width:320px;
+        height:190px;
+      }
     }
   </style>
 </head>
-
 <body>
 <div id="map"></div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
-
 <script>
 mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
@@ -149,9 +153,9 @@ const RED  = "#EC2629";
 const BLUE = "#3899EC";
 
 const IMG = {
-  derwent:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/derwent-dam-tower.jpg",
-  crashed:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/b29-overexposed-crash-site.jpg",
-  kinder:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/kinder-scout-carved-rock.png"
+  derwent: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/derwent-dam-tower.jpg",
+  crashed: "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/b29-overexposed-crash-site.jpg",
+  kinder:  "https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/kinder-scout-carved-rock.png"
 };
 
 const hikes = [
@@ -187,6 +191,7 @@ const hikes = [
   }
 ];
 
+/* Map */
 const map = new mapboxgl.Map({
   container:"map",
   style:"mapbox://styles/mapbox/satellite-streets-v12",
@@ -195,6 +200,7 @@ const map = new mapboxgl.Map({
 });
 map.addControl(new mapboxgl.NavigationControl(),"bottom-right");
 
+/* Hover sync */
 const markerElsById = {};
 const routeLayerId  = {};
 let hoveredId = null;
@@ -205,14 +211,12 @@ function setMarkerColor(id,color){
   const path = el.querySelector("svg path");
   if(path) path.setAttribute("fill",color);
 }
-
 function setRouteColor(id,color){
   const lyr = routeLayerId[id];
   if(lyr && map.getLayer(lyr)){
     map.setPaintProperty(lyr,"line-color",color);
   }
 }
-
 function applyHoverState(){
   Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
   Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
@@ -224,18 +228,19 @@ function applyHoverState(){
     map.getCanvas().style.cursor="";
   }
 }
-
 function setHovered(id){
   hoveredId=id;
   applyHoverState();
 }
 
+/* Icons */
 const icons={
   clock:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
   ascent:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`
 };
 
+/* Popup builders */
 function specsHTML(s,u){
   return `
     <div class="specs">
@@ -260,13 +265,13 @@ function popupHtmlFor(h){
     </div>`;
 }
 
+/* GPX */
 async function loadGpx(url){
   const res=await fetch(url);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
   const gj=toGeoJSON.gpx(xml);
   return gj.features.find(f=>f.geometry && f.geometry.type==="LineString");
 }
-
 function addRoute(id,line){
   const src=`route-src-${id}`;
   const lyr=`route-lyr-${id}`;
@@ -288,6 +293,7 @@ function addRoute(id,line){
   routeLayerId[id]=lyr;
 }
 
+/* Init */
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
