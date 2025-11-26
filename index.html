@@ -52,8 +52,6 @@
       width:fit-content;
       min-width:310px;                 /* 140 img + 170 text */
       max-width:360px;
-
-      /* ADDED: lock the overall height */
       height:130px;
     }
 
@@ -63,8 +61,6 @@
       border-radius:12px 0 0 12px;
       overflow:hidden;
       background:#000;
-
-      /* ADDED: match parent height */
       height:100%;
     }
     .img-wrap img{
@@ -77,17 +73,12 @@
 
     .popup-body{
       padding:8px 22px 10px 12px;
-
-      /* widened a touch so text wraps less, helping the fixed height fit */
       flex:0 0 170px;
       min-width:170px;
       max-width:170px;
-
       text-align:center;
       word-break:break-word;
       overflow:visible;
-
-      /* ADDED: vertically center content inside the fixed height */
       display:flex;
       flex-direction:column;
       justify-content:center;
@@ -120,11 +111,12 @@
 
     .popup-actions{
       display:flex;
+      flex-direction:column;           /* stack links vertically */
       gap:6px;
       justify-content:center;
       align-items:center;
       margin-top:8px;
-      flex-wrap:wrap;
+      flex-wrap:nowrap;
     }
     .popup-link{
       color:#3899EC;
@@ -137,9 +129,9 @@
     @media (max-width:440px){
       .img-wrap{ width:120px; flex-basis:120px }
       .popup-card{
-        min-width:290px;               /* 120 + 170 */
+        min-width:290px;
         max-width:320px;
-        height:190px;                  /* keep same fixed height on mobile */
+        height:190px;
       }
     }
   </style>
@@ -252,7 +244,6 @@ function specsHTML(s,u){
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
       <div class="popup-actions">
         <a class="popup-link" href="${u.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
-        <span style="font-weight:800;">&amp;</span>
         <a class="popup-link" href="${u.directionsUrl}" target="_blank" rel="noopener">Directions</a>
       </div>
     </div>`;
@@ -333,7 +324,3 @@ map.on("load", async () => {
 </script>
 </body>
 </html>
-
-
-
-
