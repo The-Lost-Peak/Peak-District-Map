@@ -66,9 +66,9 @@
     .popup-body{
       box-sizing:border-box;
       padding:8px 12px 10px 10px;
-      flex:0 0 160px;
-      min-width:160px;
-      max-width:160px;
+      flex:0 0 160px;      /* WAS 140px */
+      min-width:160px;     /* WAS 140px */
+      max-width:160px;     /* WAS 140px */
       text-align:center;
       word-break:break-word;
       overflow:visible;
@@ -101,19 +101,8 @@
       gap:4px;
     }
 
-    /* ✔ CHANGED — STAT ICONS NOW RED */
-    .icon{ 
-      width:16px; 
-      height:16px; 
-      flex:0 0 16px; 
-      color:#EC2629; 
-    }
-
-    .spec-value{ 
-      font-weight:800; 
-      color:#EC2629; 
-      font-size:13px 
-    }
+    .icon{ width:16px; height:16px; flex:0 0 16px; color:#1E1E1E }
+    .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
 
     .popup-actions{
       display:flex;
