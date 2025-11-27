@@ -27,6 +27,7 @@
       display:block;
       box-sizing:border-box;
       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
+      text-transform:uppercase; /* capitalise all popup text */
     }
 
     .popup-card{
@@ -70,7 +71,7 @@
       flex-direction:column;
       justify-content:center;
       line-height:1.2;
-      transform: translateY(-1px); /* text group up by 1px */
+      transform: translateY(-1px); /* move whole text group up by 1px */
     }
 
     .popup-heading{
@@ -88,7 +89,7 @@
       flex-direction:column;
       gap:3px;                 /* same spacing across stats and links */
       align-items:center;
-      transform: translateY(1px); /* move everything under title down by 1px */
+      transform: translateY(1px); /* move everything under the title down by 1px */
     }
     .spec-row{
       display:flex;
@@ -98,10 +99,19 @@
     }
 
     .icon{ width:16px; height:16px; flex:0 0 16px }
-    .icon-red{ color:#EC2629 } /* stats red */
-    .icon-blue{ color:#3899EC } /* links blue */
+    .icon-red{ color:#EC2629 }  /* stats red */
+    .icon-blue{ color:#3899EC } /* kept for svg fallbacks */
 
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
+
+    .popup-actions{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      justify-content:center;
+      align-items:center;
+      margin-top:6px;
+    }
 
     /* Hike Page & Directions: same font as stats, only colour differs */
     .popup-link{
@@ -115,11 +125,14 @@
       box-shadow:none !important;
       border:none !important;
     }
-    .popup-link:focus,
-    .popup-link:active{
-      outline:none !important;
-      box-shadow:none !important;
-      border:none !important;
+
+    /* Make external SVG images blue and sized like the inline icons */
+    .icon-img{
+      width:16px;
+      height:16px;
+      display:block;
+      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
+      /* turns black SVGs into #3899EC */
     }
 
     @media (max-width:440px){
@@ -223,20 +236,15 @@ function setHovered(id){
 }
 
 /* Icons */
-const icons={
-  /* stats (red) */
+const icons = {
+  /* stats (red inline svgs) */
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
   ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
 
-  /* links (blue) */
-  walk:`<svg class="icon icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="4" r="2.2"></circle>
-          <path d="M9.5 21l1.2-5.2 2.3-2.3M16.5 21l-2.4-6.2-2.1-1.3M8 12l3.2-2.2 3.6.8"></path>
-        </svg>`,
-  directions:`<svg class="icon icon-blue" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
-                <path d="M12 2c-3.866 0-7 3.03-7 6.769C5 14.5 12 22 12 22s7-7.5 7-13.231C19 5.03 15.866 2 12 2zm0 4.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z"/>
-              </svg>`
+  /* links (external svg files from your repo → coloured blue via filter) */
+  walk:`<img class="icon icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/walking-person-go-walk-move-svgrepo-com.svg" alt="walk icon">`,
+  directions:`<img class="icon icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg" alt="directions icon">`
 };
 
 function specsHTML(s,u){
@@ -278,10 +286,8 @@ function addRoute(id,line){
       source:src,
       paint:{
         "line-color":RED,
-        "line-width":4,
-        "line-opacity":0.95,
-        "line-color-transition":{duration:0,delay:0},
-        "line-width-transition":{duration:0,delay:0}
+        "line-width":3,   /* reduced thickness by 1px (from 4 to 3) */
+        "line-opacity":0.95
       }
     });
   }
