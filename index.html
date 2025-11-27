@@ -23,7 +23,6 @@
       padding:0 !important;
       box-shadow:none !important;
       width:auto !important;
-      max-width:none !important;
       overflow:visible !important;
       display:block;
       box-sizing:border-box;
@@ -44,9 +43,9 @@
     .img-wrap{
       width:140px;
       flex:0 0 140px;
+      height:100%;
       border-radius:12px 0 0 12px;
       overflow:hidden;
-      height:100%;
       background:#000;
     }
     .img-wrap img{
@@ -59,9 +58,9 @@
     .popup-body{
       box-sizing:border-box;
       padding:8px 12px 10px 10px;
-      flex:0 0 160px;
-      min-width:160px;
-      max-width:160px;
+      flex:0 0 140px;       /* MATCH IMAGE WIDTH */
+      min-width:140px;      /* MATCH IMAGE WIDTH */
+      max-width:140px;      /* MATCH IMAGE WIDTH */
       text-align:center;
       display:flex;
       flex-direction:column;
@@ -73,35 +72,32 @@
     .popup-heading{
       font-weight:800;
       font-size:11px;
-      margin:2px 0 6px 0; /* title down 2px */
+      margin:2px 0 6px 0;
       color:#1E1E1E;
     }
 
-    /* Column of everything with default row gap */
     .specs{
       font-size:10px;
       display:flex;
       flex-direction:column;
-      gap:3px;                 /* default inter-row spacing */
+      gap:3px;
       align-items:center;
       transform: translateY(1px);
-      margin-top:2px;          /* whole block down 2px (as before) */
+      margin-top:2px;
     }
 
-    /* ONLY the three red stats move up 2px */
     .stats-group{
       transform:translateY(-2px);
       display:flex;
       flex-direction:column;
-      gap:3px;                 /* keep the 3px between the three stats */
+      gap:3px;
       align-items:center;
     }
 
-    /* Restore original gap between Hike Page and Directions */
     .links-group{
       display:flex;
       flex-direction:column;
-      gap:3px;                 /* this brings back the missing space */
+      gap:3px;
       align-items:center;
     }
 
@@ -112,27 +108,31 @@
       gap:4px;
     }
 
-    .icon{ width:16px; height:16px; flex:0 0 16px }
+    .icon{ width:16px; height:16px }
     .icon-red{ color:#EC2629 }
     .icon-blue{ color:#3899EC }
 
     .icon-img{
-      width:12px; height:12px; display:block;
+      width:12px;
+      height:12px;
+      display:block;
       filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
     }
 
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
 
     .popup-link{
-      color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; outline:none !important; border:none !important;
+      color:#3899EC;
+      font-weight:800;
+      font-size:11px;
+      text-decoration:none;
     }
 
-    /* +2px extra space between ascent and Hike Page (on top of the 3px gap) */
-    .hike-gap{ margin-top:2px; }
+    .hike-gap{ margin-top:2px }
 
     @media (max-width:440px){
       .img-wrap{ width:120px; flex-basis:120px }
-      .popup-card{ min-width:290px; max-width:320px; height:190px; }
+      .popup-card{ min-width:290px; max-width:320px; height:190px }
     }
   </style>
 </head>
@@ -194,9 +194,8 @@ const map = new mapboxgl.Map({
 });
 map.addControl(new mapboxgl.NavigationControl(),"bottom-right");
 
-/* Hover system */
 const markerElsById = {};
-const routeLayerId  = {};
+const routeLayerId = {};
 let hoveredId = null;
 
 function setMarkerColor(id,color){
@@ -223,12 +222,8 @@ function applyHoverState(){
     map.getCanvas().style.cursor="";
   }
 }
-function setHovered(id){
-  hoveredId=id;
-  applyHoverState();
-}
+function setHovered(id){ hoveredId=id; applyHoverState(); }
 
-/* Icons */
 const icons = {
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -290,7 +285,7 @@ function addRoute(id,line){
         "line-color":"#EC2629",
         "line-width":3,
         "line-opacity":0.95,
-        "line-color-transition":{ duration:0 } /* instant hover colour */
+        "line-color-transition":{ duration:0 }
       }
     });
   }
