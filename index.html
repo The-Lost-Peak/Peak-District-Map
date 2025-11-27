@@ -70,13 +70,12 @@
       flex-direction:column;
       justify-content:center;
       line-height:1.2;
-      transform: translateY(2px); /* move whole text group down by 2px */
+      transform: translateY(-1px); /* move whole text group up by 1px */
     }
 
-    /* all popup text reduced by 2px */
     .popup-heading{
       font-weight:800;
-      font-size:11px; /* was 13 */
+      font-size:11px;
       line-height:1.15;
       margin:0 0 6px 0;
       color:#1E1E1E;
@@ -84,35 +83,30 @@
     }
 
     .specs{
-      font-size:10px; /* was 12 */
+      font-size:10px;
       display:flex;
       flex-direction:column;
-      gap:3px;
+      gap:3px;                 /* consistent vertical spacing for ALL rows */
       align-items:center;
     }
     .spec-row{
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:4px;
+      gap:4px;                 /* consistent icon to text spacing */
     }
 
-    .icon{ width:16px; height:16px; flex:0 0 16px; color:#EC2629 } /* stat icons in red */
-    .spec-value{ font-weight:800; color:#EC2629; font-size:11px } /* was 13 */
+    .icon{ width:16px; height:16px; flex:0 0 16px }
+    .icon-red{ color:#EC2629 }
+    .icon-blue{ color:#3899EC }
 
-    .popup-actions{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      justify-content:center;
-      align-items:center;
-      margin-top:6px;
-    }
-    /* Hike Page & Directions same font as stats (spec-value) except colour */
+    .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
+
+    /* Hike Page & Directions: same font as stats, only colour differs */
     .popup-link{
       color:#3899EC;
-      font-weight:800;         /* match stats weight */
-      font-size:11px;          /* match stats size */
+      font-weight:800;
+      font-size:11px;
       line-height:1.2;
       text-decoration:none;
       white-space:nowrap;
@@ -120,7 +114,6 @@
       box-shadow:none !important;
       border:none !important;
     }
-
     .popup-link:focus,
     .popup-link:active{
       outline:none !important;
@@ -229,9 +222,20 @@ function setHovered(id){
 }
 
 const icons={
-  clock:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
-  length:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
-  ascent:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`
+  clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
+  length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
+  ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
+  walk:`<svg class="icon icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="13" cy="5" r="3"></circle>
+          <path d="M13 8l-2 4-3 2"></path>
+          <path d="M13 8l2 4 3 2"></path>
+          <path d="M11 12l-1 6"></path>
+          <path d="M15 12l1 6"></path>
+        </svg>`,
+  directions:`<svg class="icon icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 21s-6-5.1-6-10a6 6 0 1 1 12 0c0 4.9-6 10-6 10z"></path>
+                <path d="M12 8v4l3 1"></path>
+              </svg>`
 };
 
 function specsHTML(s,u){
@@ -240,10 +244,8 @@ function specsHTML(s,u){
       <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
       <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
-      <div class="popup-actions">
-        <a class="popup-link" href="${u.hikeUrl}" target="_blank" rel="noopener">Hike Page</a>
-        <a class="popup-link" href="${u.directionsUrl}" target="_blank" rel="noopener">Directions</a>
-      </div>
+      <div class="spec-row">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank" rel="noopener">Hike Page</a></div>
+      <div class="spec-row">${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank" rel="noopener">Directions</a></div>
     </div>`;
 }
 
