@@ -73,8 +73,19 @@
     .popup-heading{
       font-weight:800;
       font-size:11px;
-      margin:2px 0 6px 0;
+      margin:2px 0 6px 0; /* title down 2px */
       color:#1E1E1E;
+    }
+
+    /* Column of everything with default row gap */
+    .specs{
+      font-size:10px;
+      display:flex;
+      flex-direction:column;
+      gap:3px;                 /* default inter-row spacing */
+      align-items:center;
+      transform: translateY(1px);
+      margin-top:2px;          /* whole block down 2px (as before) */
     }
 
     /* ONLY the three red stats move up 2px */
@@ -82,7 +93,15 @@
       transform:translateY(-2px);
       display:flex;
       flex-direction:column;
-      gap:3px;
+      gap:3px;                 /* keep the 3px between the three stats */
+      align-items:center;
+    }
+
+    /* Restore original gap between Hike Page and Directions */
+    .links-group{
+      display:flex;
+      flex-direction:column;
+      gap:3px;                 /* this brings back the missing space */
       align-items:center;
     }
 
@@ -98,37 +117,22 @@
     .icon-blue{ color:#3899EC }
 
     .icon-img{
-      width:12px;
-      height:12px;
-      display:block;
+      width:12px; height:12px; display:block;
       filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
     }
 
-    .spec-value{
-      font-weight:800;
-      color:#EC2629;
-      font-size:11px;
-    }
+    .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
 
     .popup-link{
-      color:#3899EC;
-      font-weight:800;
-      font-size:11px;
-      text-decoration:none;
-      outline:none !important;
+      color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; outline:none !important; border:none !important;
     }
 
-    .hike-gap{
-      margin-top:2px;
-    }
+    /* +2px extra space between ascent and Hike Page (on top of the 3px gap) */
+    .hike-gap{ margin-top:2px; }
 
     @media (max-width:440px){
       .img-wrap{ width:120px; flex-basis:120px }
-      .popup-card{
-        min-width:290px;
-        max-width:320px;
-        height:190px;
-      }
+      .popup-card{ min-width:290px; max-width:320px; height:190px; }
     }
   </style>
 </head>
@@ -190,6 +194,7 @@ const map = new mapboxgl.Map({
 });
 map.addControl(new mapboxgl.NavigationControl(),"bottom-right");
 
+/* Hover system */
 const markerElsById = {};
 const routeLayerId  = {};
 let hoveredId = null;
@@ -223,6 +228,7 @@ function setHovered(id){
   applyHoverState();
 }
 
+/* Icons */
 const icons = {
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -233,18 +239,23 @@ const icons = {
 
 function specsHTML(s,u){
   return `
-    <div class="stats-group">
-      <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
-      <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
-      <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
-    </div>
+    <div class="specs">
 
-    <div class="spec-row hike-gap">
-      ${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a>
-    </div>
+      <div class="stats-group">
+        <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
+        <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
+        <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
+      </div>
 
-    <div class="spec-row">
-      ${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank">Directions</a>
+      <div class="links-group">
+        <div class="spec-row hike-gap">
+          ${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a>
+        </div>
+        <div class="spec-row">
+          ${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank">Directions</a>
+        </div>
+      </div>
+
     </div>`;
 }
 
@@ -276,10 +287,10 @@ function addRoute(id,line){
       type:"line",
       source:src,
       paint:{
-        "line-color":RED,
+        "line-color":"#EC2629",
         "line-width":3,
         "line-opacity":0.95,
-        "line-color-transition":{ duration:0 }
+        "line-color-transition":{ duration:0 } /* instant hover colour */
       }
     });
   }
@@ -290,7 +301,7 @@ map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
   hikes.forEach(h=>{
-    const marker=new mapboxgl.Marker({color:RED})
+    const marker=new mapboxgl.Marker({color:"#EC2629"})
       .setLngLat(h.coords)
       .setPopup(new mapboxgl.Popup({offset:22, closeButton:false}).setHTML(popupHtmlFor(h)))
       .addTo(map);
