@@ -84,6 +84,7 @@
       gap:3px;
       align-items:center;
       transform: translateY(1px);
+      margin-top:2px; /* ★ moves the entire block down by 2px */
     }
 
     .spec-row{
@@ -115,7 +116,6 @@
       border:none !important;
     }
 
-    /* ★ Added: exact +2px before the Hike Page row */
     .hike-gap{
       margin-top:2px;
     }
@@ -237,7 +237,6 @@ function specsHTML(s,u){
       <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
       <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
 
-      <!-- ★ Added hike-gap class for the +2px extra space -->
       <div class="spec-row hike-gap">
         ${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a>
       </div>
