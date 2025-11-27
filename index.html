@@ -6,18 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
   <style>
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
     .marker{ cursor:pointer !important }
-
-    /* 15% smaller markers */
-    .marker svg{
-      transform:scale(0.85);
-      transform-origin:center;
-    }
+    .marker svg{ transform:scale(0.85); transform-origin:center }
 
     .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
     .mapboxgl-popup-tip{ display:none !important }
@@ -66,9 +60,9 @@
     .popup-body{
       box-sizing:border-box;
       padding:8px 12px 10px 10px;
-      flex:0 0 160px;      /* WAS 140px */
-      min-width:160px;     /* WAS 140px */
-      max-width:160px;     /* WAS 140px */
+      flex:0 0 160px;
+      min-width:160px;
+      max-width:160px;
       text-align:center;
       word-break:break-word;
       overflow:visible;
@@ -78,9 +72,10 @@
       line-height:1.2;
     }
 
+    /* all popup text reduced by 2px */
     .popup-heading{
       font-weight:800;
-      font-size:13px;
+      font-size:11px; /* was 13 */
       line-height:1.15;
       margin:0 0 6px 0;
       color:#1E1E1E;
@@ -88,7 +83,7 @@
     }
 
     .specs{
-      font-size:12px;
+      font-size:10px; /* was 12 */
       display:flex;
       flex-direction:column;
       gap:3px;
@@ -102,7 +97,7 @@
     }
 
     .icon{ width:16px; height:16px; flex:0 0 16px; color:#1E1E1E }
-    .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
+    .spec-value{ font-weight:800; color:#EC2629; font-size:11px } /* was 13 */
 
     .popup-actions{
       display:flex;
@@ -112,13 +107,12 @@
       align-items:center;
       margin-top:6px;
     }
-
     .popup-link{
       color:#3899EC;
       font-weight:600;
       text-decoration:none;
       white-space:nowrap;
-      font-size:13px;
+      font-size:11px; /* was 13 */
       outline:none !important;
       box-shadow:none !important;
       border:none !important;
@@ -191,7 +185,6 @@ const hikes = [
   }
 ];
 
-/* Map */
 const map = new mapboxgl.Map({
   container:"map",
   style:"mapbox://styles/mapbox/satellite-streets-v12",
@@ -200,7 +193,6 @@ const map = new mapboxgl.Map({
 });
 map.addControl(new mapboxgl.NavigationControl(),"bottom-right");
 
-/* Hover sync */
 const markerElsById = {};
 const routeLayerId  = {};
 let hoveredId = null;
@@ -233,14 +225,12 @@ function setHovered(id){
   applyHoverState();
 }
 
-/* Icons */
 const icons={
   clock:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
   ascent:`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`
 };
 
-/* Popup builders */
 function specsHTML(s,u){
   return `
     <div class="specs">
@@ -265,7 +255,6 @@ function popupHtmlFor(h){
     </div>`;
 }
 
-/* GPX */
 async function loadGpx(url){
   const res=await fetch(url);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
@@ -293,7 +282,6 @@ function addRoute(id,line){
   routeLayerId[id]=lyr;
 }
 
-/* Init */
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
