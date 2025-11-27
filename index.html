@@ -58,9 +58,9 @@
     .popup-body{
       box-sizing:border-box;
       padding:8px 12px 10px 10px;
-      flex:0 0 140px;       /* MATCH IMAGE WIDTH */
-      min-width:140px;      /* MATCH IMAGE WIDTH */
-      max-width:140px;      /* MATCH IMAGE WIDTH */
+      flex:0 0 140px;       /* match image width */
+      min-width:140px;
+      max-width:140px;
       text-align:center;
       display:flex;
       flex-direction:column;
@@ -97,7 +97,7 @@
     .links-group{
       display:flex;
       flex-direction:column;
-      gap:3px;
+      gap:3px;  /* ensure same gap between Hike Page and Directions */
       align-items:center;
     }
 
@@ -121,11 +121,25 @@
 
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
 
+    /* remove black focus ring on links */
     .popup-link{
       color:#3899EC;
       font-weight:800;
       font-size:11px;
       text-decoration:none;
+      outline:none !important;
+      border:none !important;
+      box-shadow:none !important;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+    .popup-link:focus,
+    .popup-link:focus-visible,
+    .popup-link:active{
+      outline:none !important;
+      border:none !important;
+      box-shadow:none !important;
     }
 
     .hike-gap{ margin-top:2px }
