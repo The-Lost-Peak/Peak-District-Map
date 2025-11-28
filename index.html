@@ -10,7 +10,6 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
-    /* Hide Mapbox logo and attribution (you'll do attribution elsewhere) */
     .mapboxgl-ctrl-logo,
     .mapboxgl-ctrl-attrib,
     .mapboxgl-ctrl-attrib-inner { display:none !important; visibility:hidden !important; }
@@ -60,11 +59,9 @@
 
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; outline:none !important; border:none !important; box-shadow:none !important }
-    .popup-link:focus, .popup-link:focus-visible, .popup-link:active{ outline:none !important; border:none !important; box-shadow:none !important }
 
     .hike-gap{ margin-top:2px }
 
-    /* Slightly smaller fullscreen icon (only affects the fullscreen button) */
     .mapboxgl-ctrl-fullscreen .mapboxgl-ctrl-icon {
       transform: scale(0.88);
       transform-origin: center;
@@ -117,18 +114,15 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
-/* Add controls */
 const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 const fs  = new mapboxgl.FullscreenControl();
 map.addControl(fs, "bottom-right");
 
-/* Merge the fullscreen button into the same group (after zoom-out, before compass) */
 function mergeFullscreenIntoNavOnce(){
   const corner = map.getContainer().querySelector('.mapboxgl-ctrl-bottom-right');
   if(!corner) return false;
 
-  // The nav group is the one containing zoom-in
   const navGroup = Array.from(corner.querySelectorAll('.mapboxgl-ctrl-group'))
     .find(g => g.querySelector('.mapboxgl-ctrl-zoom-in'));
   const fsBtn = corner.querySelector('button.mapboxgl-ctrl-fullscreen');
@@ -149,7 +143,6 @@ function mergeFullscreenIntoNavOnce(){
 }
 
 map.on('load', () => {
-  // Try a few times until the controls are in the DOM, then stop
   let tries = 0;
   (function tryMerge(){
     if (mergeFullscreenIntoNavOnce() || (++tries > 20)) return;
@@ -157,7 +150,6 @@ map.on('load', () => {
   })();
 });
 
-/* Hover system */
 const markerElsById={}, routeLayerId={}; let hoveredId=null;
 function setMarkerColor(id,c){ const el=markerElsById[id]; if(!el) return; const p=el.querySelector("svg path"); if(p) p.setAttribute("fill",c); }
 function setRouteColor(id,c){ const lyr=routeLayerId[id]; if(lyr && map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",c); }
@@ -172,7 +164,7 @@ function setHovered(id){ hoveredId=id; applyHoverState(); }
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
-  ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
+  ascent:`<svg class="icon icon-red" viewBox="0 24 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
   walk:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/walking-person-go-walk-move-svgrepo-com.svg">`,
   directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
 };
@@ -247,9 +239,8 @@ map.on("load", async () => {
     }catch(e){}
   }
 
-  // Mobile specific zoom: closer on small screens
-  const isMobile = window.innerWidth < 600;
-  map.fitBounds(bounds,{ padding:110, maxZoom: isMobile ? 12 : 11 });
+  // Single zoom level for both desktop & mobile
+  map.fitBounds(bounds,{ padding:110, maxZoom:11 });
 });
 </script>
 </body>
