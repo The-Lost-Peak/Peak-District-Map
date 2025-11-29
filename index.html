@@ -162,29 +162,29 @@ map.on("load", async () => {
   });
 
   // routes (wait for all before fitting bounds)
-  const lines = await Promise.all(hikes.map(async h=>{
+  await Promise.all(hikes.map(async h=>{
     try{
       const line = await loadGpx(h.gpx);
       if(line){
-        const lyr = addRoute(h.id,line);
+        addRoute(h.id,line);
         line.geometry.coordinates.forEach(c=>bounds.extend(c));
-        return { id:h.id, layer:lyr };
       }
     }catch(e){}
-    return null;
   }));
 
-  // fit once, then apply mobile tweak
+  // Fit, then cap zoom ONLY if Mapbox fitted too close on mobile
   const isMobile = window.innerWidth < 600;
-  const mobileMinZoom = 12.2; // medium
+  const mobileMaxZoom = 11.6;  // cap: never end closer than this on phones
 
   map.fitBounds(bounds,{
     padding: isMobile ? 30 : 110,
     maxZoom: isMobile ? 14 : 11
   });
 
-  if(isMobile){
-    map.once('idle', ()=>{ if(map.getZoom()<mobileMinZoom) map.setZoom(mobileMinZoom); });
+  if (isMobile) {
+    map.once('idle', () => {
+      if (map.getZoom() > mobileMaxZoom) map.setZoom(mobileMaxZoom); // only zooms OUT, never in
+    });
   }
 });
 </script>
