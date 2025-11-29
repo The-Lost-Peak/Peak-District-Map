@@ -45,7 +45,7 @@
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; }
 
-    /* iOS fullscreen page mode (used only when opened as ?fs=1) */
+    /* iOS fullscreen page mode for ?fs=1 */
     body.ios-fullscreen #map{ position:fixed; inset:0; z-index:1; background:#000 }
     body.ios-fullscreen .mapboxgl-ctrl-bottom-right{ z-index:2 }
 
@@ -96,13 +96,13 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
-/* Controls for desktop and Android */
+/* desktop and Android controls */
 const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 const fs  = new mapboxgl.FullscreenControl();
 map.addControl(fs, "bottom-right");
 
-/* iOS detection and query helper */
+/* iOS detection and query */
 function isIOS(){
   const ua = navigator.userAgent || "";
   const platform = navigator.platform || "";
@@ -112,10 +112,9 @@ function isIOS(){
 }
 const params = new URLSearchParams(location.search);
 
-/* If opened as ?fs=1 on iOS, apply fullscreen page mode and hide Mapbox FS control */
+/* if opened as ?fs=1 on iOS, apply page fullscreen and hide Mapbox FS */
 if (isIOS() && params.get("fs") === "1") {
   document.body.classList.add("ios-fullscreen");
-
   const hideMbFs = () => {
     const mb = document.querySelector('.mapboxgl-ctrl-fullscreen');
     if (mb) mb.style.display = 'none';
@@ -124,10 +123,10 @@ if (isIOS() && params.get("fs") === "1") {
   setTimeout(hideMbFs, 500);
 }
 
-/* Add iOS fullscreen button under zoom-out in the Mapbox control group (but NOT on ?fs=1) */
+/* iOS custom fullscreen button under zoom out, color matched to +/- */
 function addIOSFullscreenButton(){
   if(!isIOS()) return;
-  if(params.get("fs") === "1") return; // do not render button in fullscreen tab
+  if(params.get("fs") === "1") return;
 
   const corner = map.getContainer().querySelector('.mapboxgl-ctrl-bottom-right');
   if(!corner) return;
@@ -136,11 +135,18 @@ function addIOSFullscreenButton(){
     .find(g => g.querySelector('.mapboxgl-ctrl-zoom-in'));
   if(!navGroup) return;
 
-  const zoomIn  = navGroup.querySelector('.mapboxgl-ctrl-zoom-in');
+  const zoomInSvgPath = navGroup.querySelector('.mapboxgl-ctrl-zoom-in svg path') ||
+                        navGroup.querySelector('.mapboxgl-ctrl-zoom-in svg line') ||
+                        navGroup.querySelector('.mapboxgl-ctrl-zoom-in svg');
   const zoomOut = navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
   const compass = navGroup.querySelector('.mapboxgl-ctrl-compass');
 
-  // Build a control-group with a single button so it inherits Mapbox styling
+  let iconColor = "#fff";
+  if (zoomInSvgPath) {
+    const s = getComputedStyle(zoomInSvgPath);
+    iconColor = s.stroke || s.fill || "#fff";
+  }
+
   const iosBtnGroup = document.createElement('div');
   iosBtnGroup.className = 'mapboxgl-ctrl-group';
 
@@ -149,31 +155,23 @@ function addIOSFullscreenButton(){
   btn.type = 'button';
   btn.setAttribute('aria-label','Fullscreen');
 
-  // Match icon color to +/− by using their computed color
-  if (zoomIn) {
-    const c = getComputedStyle(zoomIn).color;
-    btn.style.color = c;  // our SVG uses currentColor for stroke
-  }
-
   btn.innerHTML = `
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-      <polyline points="4,9 4,4 9,4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="20,9 20,4 15,4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="4,15 4,20 9,20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="20,15 20,20 15,20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="4,9 4,4 9,4" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="20,9 20,4 15,4" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="4,15 4,20 9,20" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="20,15 20,20 15,20" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
     </svg>
   `;
 
   iosBtnGroup.appendChild(btn);
 
-  // Insert under zoom-out (Option A), before compass if present
   if (zoomOut) {
     navGroup.insertBefore(iosBtnGroup, compass ? compass : zoomOut.nextSibling);
   } else {
     navGroup.appendChild(iosBtnGroup);
   }
 
-  // iOS behaviour: open a new tab with ?fs=1 (your proven pattern)
   btn.addEventListener('click', () => {
     const url = new URL(window.location.href);
     url.searchParams.set("fs", "1");
@@ -241,7 +239,6 @@ map.on("load", async () => {
 
   const bounds=new mapboxgl.LngLatBounds();
 
-  // markers
   hikes.forEach(h=>{
     new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
@@ -250,7 +247,6 @@ map.on("load", async () => {
     bounds.extend(h.coords);
   });
 
-  // routes
   await Promise.all(hikes.map(async h=>{
     try{
       const line = await loadGpx(h.gpx);
@@ -261,7 +257,6 @@ map.on("load", async () => {
     }catch(e){}
   }));
 
-  // mobile fit with max zoom cap so it never ends up too close
   const isMobile = window.innerWidth < 600;
   const mobileMaxZoom = 11.6;
 
