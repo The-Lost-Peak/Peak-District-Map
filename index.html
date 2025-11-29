@@ -56,17 +56,20 @@
       background:#fff !important;
       outline:none !important;
       box-shadow:none;
+      padding:0;
+      line-height:1;
     }
     .mapboxgl-ctrl-group > button.ios-fs-btn:hover,
     .mapboxgl-ctrl-group > button.ios-fs-btn:active{
       background:rgba(0,0,0,.1) !important;
     }
+    .ios-fs-btn svg{ display:block; width:20px; height:20px; margin:0 auto; }
 
-    /* Nudge only the fullscreen button */
+    /* Nudge only the fullscreen button to line up */
     #iosFullscreenBtn{
       position:relative;
-      top:2px;     /* down 2px */
-      left:-1px;   /* left 1px */
+      top:3px;     /* down by 3px */
+      left:0;      /* no horizontal nudge */
     }
 
     @media (max-width:440px){
