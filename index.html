@@ -128,11 +128,6 @@ const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-/* HOVER SYSTEM */
-const markerElsById={}, routeLayerId={}; let hoveredId=null;
-function setMarkerColor(id,c){ const el=markerElsById[id]; if(!el) return; const p=el.querySelector("svg path"); if(p) p.setAttribute("fill",c); }
-function setRouteColor(id,c){ const lyr=routeLayerId[id]; if(lyr && map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",c); }
-
 /* ICONS */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
@@ -168,7 +163,6 @@ function popupHtmlFor(h){
     </div>`;
 }
 
-/* GPX */
 async function loadGpx(url){
   const res=await fetch(url);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
@@ -190,7 +184,6 @@ function addRoute(id,line){
   routeLayerId[id]=lyr;
 }
 
-/* MAIN LOAD */
 map.on("load", async () => {
 
   const bounds=new mapboxgl.LngLatBounds();
@@ -216,11 +209,11 @@ map.on("load", async () => {
   }
 
   /* -------------------------------
-     MOBILE ZOOM FIX (updated)
+     MOBILE ZOOM FIX — MEDIUM (12.2)
      ------------------------------- */
 
   const isMobile = window.innerWidth < 600;
-  const mobileMinZoom = 12.5;   // <-- UPDATED HERE
+  const mobileMinZoom = 12.2;   // MEDIUM ZOOM OUT
 
   map.fitBounds(bounds,{
     padding: isMobile ? 30 : 110,
