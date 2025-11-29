@@ -45,9 +45,14 @@
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; }
 
-    /* iOS fullscreen page mode */
+    /* iOS fullscreen page mode (used only when opened as ?fs=1) */
     body.ios-fullscreen #map{ position:fixed; inset:0; z-index:1; background:#000 }
     body.ios-fullscreen .mapboxgl-ctrl-bottom-right{ z-index:2 }
+
+    @media (max-width:440px){
+      .img-wrap{ width:120px; flex-basis:120px }
+      .popup-card{ min-width:290px; max-width:320px; height:190px }
+    }
   </style>
 </head>
 <body>
@@ -107,22 +112,22 @@ function isIOS(){
 }
 const params = new URLSearchParams(location.search);
 
-/* If opened as ?fs=1 on iOS, apply fullscreen page mode and hide Mapbox FS button */
+/* If opened as ?fs=1 on iOS, apply fullscreen page mode and hide Mapbox FS control */
 if (isIOS() && params.get("fs") === "1") {
   document.body.classList.add("ios-fullscreen");
-  // Hide Mapbox fullscreen control inside the fullscreen tab
+
   const hideMbFs = () => {
     const mb = document.querySelector('.mapboxgl-ctrl-fullscreen');
     if (mb) mb.style.display = 'none';
   };
-  // Try now and again after controls mount
   hideMbFs();
   setTimeout(hideMbFs, 500);
 }
 
-/* Add iOS fullscreen button under zoom-out in the Mapbox control group */
+/* Add iOS fullscreen button under zoom-out in the Mapbox control group (but NOT on ?fs=1) */
 function addIOSFullscreenButton(){
   if(!isIOS()) return;
+  if(params.get("fs") === "1") return; // do not render button in fullscreen tab
 
   const corner = map.getContainer().querySelector('.mapboxgl-ctrl-bottom-right');
   if(!corner) return;
@@ -131,10 +136,11 @@ function addIOSFullscreenButton(){
     .find(g => g.querySelector('.mapboxgl-ctrl-zoom-in'));
   if(!navGroup) return;
 
+  const zoomIn  = navGroup.querySelector('.mapboxgl-ctrl-zoom-in');
   const zoomOut = navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
   const compass = navGroup.querySelector('.mapboxgl-ctrl-compass');
 
-  // Create button styled like Mapbox controls
+  // Build a control-group with a single button so it inherits Mapbox styling
   const iosBtnGroup = document.createElement('div');
   iosBtnGroup.className = 'mapboxgl-ctrl-group';
 
@@ -142,6 +148,12 @@ function addIOSFullscreenButton(){
   btn.className = 'mapboxgl-ctrl-icon';
   btn.type = 'button';
   btn.setAttribute('aria-label','Fullscreen');
+
+  // Match icon color to +/− by using their computed color
+  if (zoomIn) {
+    const c = getComputedStyle(zoomIn).color;
+    btn.style.color = c;  // our SVG uses currentColor for stroke
+  }
 
   btn.innerHTML = `
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -154,14 +166,14 @@ function addIOSFullscreenButton(){
 
   iosBtnGroup.appendChild(btn);
 
-  // Insert under zoom-out and before compass if present
+  // Insert under zoom-out (Option A), before compass if present
   if (zoomOut) {
     navGroup.insertBefore(iosBtnGroup, compass ? compass : zoomOut.nextSibling);
   } else {
     navGroup.appendChild(iosBtnGroup);
   }
 
-  // On iOS, open a new tab with ?fs=1 like your working flyover code
+  // iOS behaviour: open a new tab with ?fs=1 (your proven pattern)
   btn.addEventListener('click', () => {
     const url = new URL(window.location.href);
     url.searchParams.set("fs", "1");
@@ -175,8 +187,8 @@ map.on('load', () => {
 
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
-  length:`<svg class="icon icon-red" viewBox="0 24 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
-  ascent:`<svg class="icon icon-red" viewBox="0 24 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
+  length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
+  ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
   walk:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/walking-person-go-walk-move-svgrepo-com.svg">`,
   directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
 };
