@@ -10,7 +10,6 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
-    /* You handle attribution elsewhere */
     .mapboxgl-ctrl-logo,
     .mapboxgl-ctrl-attrib,
     .mapboxgl-ctrl-attrib-inner { display:none !important; visibility:hidden !important; }
@@ -52,15 +51,22 @@
     body.ios-fullscreen #map{ position:fixed; inset:0; z-index:1; background:#000 }
     body.ios-fullscreen .mapboxgl-ctrl-bottom-right{ z-index:2 }
 
-    /* iOS fullscreen button should look identical to Mapbox buttons */
+    /* iOS fullscreen button look */
     .mapboxgl-ctrl-group > button.ios-fs-btn{
       background:#fff !important;
       outline:none !important;
-      box-shadow:none; /* separators are handled by Mapbox; no custom shadow */
+      box-shadow:none;
     }
     .mapboxgl-ctrl-group > button.ios-fs-btn:hover,
     .mapboxgl-ctrl-group > button.ios-fs-btn:active{
       background:rgba(0,0,0,.1) !important;
+    }
+
+    /* Nudge only the fullscreen button */
+    #iosFullscreenBtn{
+      position:relative;
+      top:2px;     /* down 2px */
+      left:-1px;   /* left 1px */
     }
 
     @media (max-width:440px){
@@ -110,7 +116,7 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
-/* Desktop & Android controls */
+/* Desktop and Android controls */
 const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 const fs = new mapboxgl.FullscreenControl();
@@ -126,22 +132,21 @@ function isIOS(){
 }
 const params = new URLSearchParams(location.search);
 
-/* If opened as ?fs=1 on iOS, apply page-fullscreen and hide native FS control */
+/* If opened as ?fs=1 on iOS, go page-fullscreen and hide native FS control */
 if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
   const hideMbFs=()=>{ const mb=document.querySelector('.mapboxgl-ctrl-fullscreen'); if(mb) mb.style.display='none'; };
   hideMbFs(); setTimeout(hideMbFs, 500);
 }
 
-/* iOS custom fullscreen button (black icon) inserted into the SAME group as +/− */
+/* iOS custom fullscreen button (black icon) directly inside existing group */
 function addIOSFullscreenButton(){
   if(!isIOS()) return;
-  if(params.get("fs")==="1") return; // don't show inside the fullscreen tab
+  if(params.get("fs")==="1") return;
 
   const corner = map.getContainer().querySelector('.mapboxgl-ctrl-bottom-right');
   if(!corner) return;
 
-  // find the existing group that contains zoom-in
   const navGroup = Array.from(corner.querySelectorAll('.mapboxgl-ctrl-group'))
     .find(g => g.querySelector('.mapboxgl-ctrl-zoom-in'));
   if(!navGroup) return;
@@ -149,13 +154,12 @@ function addIOSFullscreenButton(){
   const zoomOut = navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
   const compass = navGroup.querySelector('.mapboxgl-ctrl-compass');
 
-  // create just a BUTTON (no extra group wrapper)
   const btn=document.createElement('button');
   btn.className='mapboxgl-ctrl-icon ios-fs-btn';
   btn.type='button';
+  btn.id='iosFullscreenBtn';
   btn.setAttribute('aria-label','Fullscreen');
 
-  // pure black icon to match iOS +/- icons
   btn.innerHTML = `
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
       <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
@@ -165,7 +169,6 @@ function addIOSFullscreenButton(){
     </svg>
   `;
 
-  // insert directly after zoom-out and before compass so separators are straight
   if(zoomOut){
     navGroup.insertBefore(btn, compass ? compass : zoomOut.nextSibling);
   }else{
@@ -181,7 +184,7 @@ function addIOSFullscreenButton(){
 
 map.on('load', ()=>{ addIOSFullscreenButton(); });
 
-/* Icons used inside popup content */
+/* Icons for popup content */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -237,7 +240,6 @@ function addRoute(id,line){
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
-  // markers
   hikes.forEach(h=>{
     new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
@@ -246,7 +248,6 @@ map.on("load", async () => {
     bounds.extend(h.coords);
   });
 
-  // routes
   await Promise.all(hikes.map(async h=>{
     try{
       const line=await loadGpx(h.gpx);
@@ -257,7 +258,6 @@ map.on("load", async () => {
     }catch(e){}
   }));
 
-  // mobile fit with sensible cap (prevents over-zoom on iPhone)
   const isMobile = window.innerWidth < 600;
   const mobileMaxZoom = 11.6;
 
