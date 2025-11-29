@@ -10,7 +10,10 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
-    .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib, .mapboxgl-ctrl-attrib-inner { display:none !important; visibility:hidden !important; }
+    /* Hide Mapbox default attribution/logo (you handle attribution elsewhere) */
+    .mapboxgl-ctrl-logo,
+    .mapboxgl-ctrl-attrib,
+    .mapboxgl-ctrl-attrib-inner { display:none !important; visibility:hidden !important; }
 
     .marker{ cursor:pointer !important }
     .marker svg{ transform:scale(0.85); transform-origin:center }
@@ -45,9 +48,18 @@
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; }
 
-    /* iOS fullscreen page mode for ?fs=1 */
+    /* iOS "fullscreen tab" mode when opened as ?fs=1 */
     body.ios-fullscreen #map{ position:fixed; inset:0; z-index:1; background:#000 }
     body.ios-fullscreen .mapboxgl-ctrl-bottom-right{ z-index:2 }
+
+    /* Make the custom iOS fullscreen control match Mapbox buttons */
+    .mapboxgl-ctrl-group > button.ios-fs-btn{
+      background:#fff !important;
+    }
+    .mapboxgl-ctrl-group > button.ios-fs-btn:hover,
+    .mapboxgl-ctrl-group > button.ios-fs-btn:active{
+      background:rgba(0,0,0,.1) !important;
+    }
 
     @media (max-width:440px){
       .img-wrap{ width:120px; flex-basis:120px }
@@ -96,10 +108,10 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
-/* desktop and Android controls */
+/* Desktop & Android controls */
 const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
-const fs  = new mapboxgl.FullscreenControl();
+const fs = new mapboxgl.FullscreenControl();
 map.addControl(fs, "bottom-right");
 
 /* iOS detection and query */
@@ -112,21 +124,17 @@ function isIOS(){
 }
 const params = new URLSearchParams(location.search);
 
-/* if opened as ?fs=1 on iOS, apply page fullscreen and hide Mapbox FS */
-if (isIOS() && params.get("fs") === "1") {
+/* If opened as ?fs=1 on iOS, apply page-fullscreen and hide native FS control */
+if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
-  const hideMbFs = () => {
-    const mb = document.querySelector('.mapboxgl-ctrl-fullscreen');
-    if (mb) mb.style.display = 'none';
-  };
-  hideMbFs();
-  setTimeout(hideMbFs, 500);
+  const hideMbFs=()=>{ const mb=document.querySelector('.mapboxgl-ctrl-fullscreen'); if(mb) mb.style.display='none'; };
+  hideMbFs(); setTimeout(hideMbFs, 500);
 }
 
-/* iOS custom fullscreen button under zoom out, color matched to +/- */
+/* iOS custom fullscreen button (black icon), inserted with Mapbox styling */
 function addIOSFullscreenButton(){
   if(!isIOS()) return;
-  if(params.get("fs") === "1") return;
+  if(params.get("fs")==="1") return; // don't show inside the fullscreen tab
 
   const corner = map.getContainer().querySelector('.mapboxgl-ctrl-bottom-right');
   if(!corner) return;
@@ -135,54 +143,45 @@ function addIOSFullscreenButton(){
     .find(g => g.querySelector('.mapboxgl-ctrl-zoom-in'));
   if(!navGroup) return;
 
-  const zoomInSvgPath = navGroup.querySelector('.mapboxgl-ctrl-zoom-in svg path') ||
-                        navGroup.querySelector('.mapboxgl-ctrl-zoom-in svg line') ||
-                        navGroup.querySelector('.mapboxgl-ctrl-zoom-in svg');
   const zoomOut = navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
   const compass = navGroup.querySelector('.mapboxgl-ctrl-compass');
 
-  let iconColor = "#fff";
-  if (zoomInSvgPath) {
-    const s = getComputedStyle(zoomInSvgPath);
-    iconColor = s.stroke || s.fill || "#fff";
-  }
+  const iosBtnGroup=document.createElement('div');
+  iosBtnGroup.className='mapboxgl-ctrl-group';
 
-  const iosBtnGroup = document.createElement('div');
-  iosBtnGroup.className = 'mapboxgl-ctrl-group';
-
-  const btn = document.createElement('button');
-  btn.className = 'mapboxgl-ctrl-icon';
-  btn.type = 'button';
+  const btn=document.createElement('button');
+  btn.className='mapboxgl-ctrl-icon ios-fs-btn';
+  btn.type='button';
   btn.setAttribute('aria-label','Fullscreen');
 
+  /* Pure black icon to match iOS +/- */
   btn.innerHTML = `
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-      <polyline points="4,9 4,4 9,4" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="20,9 20,4 15,4" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="4,15 4,20 9,20" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="20,15 20,20 15,20" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="20,9 20,4 15,4" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="4,15 4,20 9,20" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="20,15 20,20 15,20" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
     </svg>
   `;
 
   iosBtnGroup.appendChild(btn);
 
-  if (zoomOut) {
+  if(zoomOut){
     navGroup.insertBefore(iosBtnGroup, compass ? compass : zoomOut.nextSibling);
-  } else {
+  }else{
     navGroup.appendChild(iosBtnGroup);
   }
 
-  btn.addEventListener('click', () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("fs", "1");
+  btn.addEventListener('click',()=>{
+    const url=new URL(window.location.href);
+    url.searchParams.set("fs","1");
     window.open(url.toString(), "_blank");
   });
 }
 
-map.on('load', () => {
-  addIOSFullscreenButton();
-});
+map.on('load', ()=>{ addIOSFullscreenButton(); });
 
+/* Icons used inside popup content */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -236,9 +235,9 @@ function addRoute(id,line){
 }
 
 map.on("load", async () => {
-
   const bounds=new mapboxgl.LngLatBounds();
 
+  // markers
   hikes.forEach(h=>{
     new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
@@ -247,9 +246,10 @@ map.on("load", async () => {
     bounds.extend(h.coords);
   });
 
+  // routes
   await Promise.all(hikes.map(async h=>{
     try{
-      const line = await loadGpx(h.gpx);
+      const line=await loadGpx(h.gpx);
       if(line){
         addRoute(h.id,line);
         line.geometry.coordinates.forEach(c=>bounds.extend(c));
@@ -257,6 +257,7 @@ map.on("load", async () => {
     }catch(e){}
   }));
 
+  // mobile fit with sensible cap (prevents over-zoom on iPhone)
   const isMobile = window.innerWidth < 600;
   const mobileMaxZoom = 11.6;
 
