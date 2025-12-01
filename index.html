@@ -45,10 +45,7 @@
       overflow:hidden;
       background:#000;
     }
-
-    .img-wrap img{
-      width:100%; height:100%; object-fit:cover; display:block;
-    }
+    .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block }
 
     .popup-body{
       box-sizing:border-box;
@@ -68,19 +65,13 @@
     .specs{ font-size:12px; display:flex; flex-direction:column; gap:3px; align-items:center; margin-top:2px }
     .stats-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
     .links-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
-
     .spec-row{ display:flex; align-items:center; justify-content:center; gap:4px }
     .icon{ width:16px; height:16px }
     .icon-red{ color:#EC2629 } .icon-blue{ color:#3899EC }
-
-    .icon-img{
-      width:12px; height:12px; display:block;
-      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
-    }
-
+    .icon-img{ width:12px; height:12px; display:block; filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%) }
     .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
-    .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none; }
-    a:focus{ outline:none !important; }
+    .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none }
+    a:focus{ outline:none !important }
 
     #iosFullscreenBtn svg{
       width:20px; height:20px; display:block;
@@ -90,26 +81,24 @@
 
     /* MOBILE POPUP DIMENSIONS */
     @media (max-width:440px){
-      .popup-card{
-        height:115px !important;
-      }
+      .popup-card{ height:115px !important }
       .img-wrap{
         width:105px !important;
         flex-basis:105px !important;
         height:115px !important;
       }
+      /* make the TEXT column slightly wider to visually match the image column */
       .popup-body{
-        flex:0 0 105px !important;
-        min-width:105px !important;
-        max-width:105px !important;
+        flex:0 0 108px !important;
+        min-width:108px !important;
+        max-width:108px !important;
         padding:4px 6px !important;
       }
-      /* ↓ fonts reduced by 1px on mobile */
+      /* fonts reduced by 1px on mobile (as previously set) */
       .popup-heading{ font-size:9.5px !important }
       .specs{ font-size:8.5px !important }
       .spec-value{ font-size:9.5px !important }
       .popup-link{ font-size:10px !important }
-
       .icon{ width:11px !important; height:11px !important }
       .icon-img{ width:9px !important; height:9px !important }
     }
@@ -246,7 +235,7 @@ function specsHTML(s,u){
 function popupHtmlFor(h){
   return `
     <div class="popup-card">
-      <div class="img-wrap"><img src="${h.photo}"></div>
+      <div class="img-wrap"><img src="${h.photo}" alt="${h.name}"></div>
       <div class="popup-body">
         <div class="popup-heading">${h.name}</div>
         ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
@@ -285,15 +274,10 @@ map.on("load", async () => {
       closeButton:false
     }).setHTML(popupHtmlFor(h));
 
-    // keep the simple recentre on mobile
     popup.on('open', () => {
       if (window.innerWidth < 600) {
         const markerLngLat = popup.getLngLat();
-        map.easeTo({
-          center: markerLngLat,
-          offset: [0, -80],
-          duration: 400
-        });
+        map.easeTo({ center: markerLngLat, offset: [0, -80], duration: 400 });
       }
     });
 
