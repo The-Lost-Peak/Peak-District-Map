@@ -64,25 +64,27 @@
 
     #iosFullscreenBtn{ position:static; }
 
-    /* current tiny nudge from your latest */
+    /* icon micro-nudge (unchanged) */
     #iosFullscreenBtn svg{
       display:block; width:20px; height:20px; margin:0 auto;
       transform: translate(-0.35px, 0.2px);
     }
 
-    /* MOBILE-ONLY TIGHTER POPUP */
+    /* MOBILE — make popup smaller again */
     @media (max-width:440px){
-      .popup-card{ height:150px }                 /* down from 190 */
-      .img-wrap{ width:108px; flex-basis:108px }  /* down from 120 */
+      .popup-card{ height:138px }                         /* smaller overall height */
+      .img-wrap{ width:100px; flex-basis:100px }          /* narrower image panel */
       .popup-body{
-        padding:6px 10px 8px 8px;
-        flex:0 0 128px; min-width:128px; max-width:128px;  /* down from 140 */
+        padding:5px 8px 7px 7px;
+        flex:0 0 118px; min-width:118px; max-width:118px; /* narrower content panel */
       }
-      .popup-heading{ font-size:10px; margin:1px 0 5px 0 }
-      .specs{ font-size:9px; gap:2px; margin-top:1px; transform:none }
-      .spec-value{ font-size:10px }
-      .icon{ width:14px; height:14px }
-      .icon-img{ width:11px; height:11px }
+      .popup-heading{ font-size:9.5px; margin:0 0 4px 0 }
+      .specs{ font-size:8.5px; gap:2px; margin-top:0; transform:none }
+      .spec-row{ gap:3px }
+      .spec-value{ font-size:9.5px }
+      .popup-link{ font-size:10px }
+      .icon{ width:12px; height:12px }
+      .icon-img{ width:10px; height:10px }
     }
   </style>
 </head>
