@@ -28,59 +28,105 @@
     }
 
     .popup-card{
-      display:flex; align-items:stretch; background:#fff; border-radius:12px; overflow:hidden;
-      width:fit-content; height:130px;
+      display:flex;
+      align-items:stretch;
+      background:#fff;
+      border-radius:12px;
+      overflow:hidden;
+      width:fit-content;
+      height:130px;
     }
 
     .img-wrap{
-      width:140px; flex:0 0 140px; height:100%;
-      border-radius:12px 0 0 12px; overflow:hidden; background:#000
+      width:140px;
+      flex:0 0 140px;
+      height:100%;
+      border-radius:12px 0 0 12px;
+      overflow:hidden;
+      background:#000;
     }
-    .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block }
+
+    .img-wrap img{
+      width:100%; height:100%; object-fit:cover; display:block;
+    }
 
     .popup-body{
-      box-sizing:border-box; padding:8px 12px 10px 10px; flex:0 0 140px; min-width:140px; max-width:140px;
-      text-align:center; display:flex; flex-direction:column; justify-content:center; line-height:1.2; transform:translateY(-1px);
+      box-sizing:border-box;
+      padding:8px 12px 10px 10px;
+      flex:0 0 140px;
+      min-width:140px;
+      max-width:140px;
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      line-height:1.2;
+      transform:translateY(-1px);
     }
 
-    /* fonts were already +2px */
     .popup-heading{ font-weight:800; font-size:13px; margin:2px 0 6px 0; color:#1E1E1E }
     .specs{ font-size:12px; display:flex; flex-direction:column; gap:3px; align-items:center; margin-top:2px }
     .stats-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
     .links-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
+
     .spec-row{ display:flex; align-items:center; justify-content:center; gap:4px }
     .icon{ width:16px; height:16px }
     .icon-red{ color:#EC2629 } .icon-blue{ color:#3899EC }
-    .icon-img{ width:12px; height:12px; display:block; filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%) }
+
+    .icon-img{
+      width:12px; height:12px; display:block;
+      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
+    }
+
     .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
-    .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none }
-    a:focus{ outline:none !important }
+    .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none; }
+    a:focus{ outline:none !important; }
 
-    #iosFullscreenBtn svg{ width:20px; height:20px; display:block; transform:translate(-0.35px,0.2px); margin:0 auto }
+    #iosFullscreenBtn svg{
+      width:20px; height:20px; display:block;
+      transform:translate(-0.35px,0.2px);
+      margin:0 auto;
+    }
 
-    /* MOBILE: image width = text width = 105px */
+    /* MOBILE POPUP DIMENSIONS */
     @media (max-width:440px){
-      .popup-card{ height:115px !important }
-      .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
-      .popup-body{ flex:0 0 105px !important; min-width:105px !important; max-width:105px !important; padding:4px 6px !important }
-      .popup-heading{ font-size:10.5px !important }
-      .specs{ font-size:9.5px !important }
-      .spec-value{ font-size:10.5px !important }
-      .popup-link{ font-size:11px !important }
+      .popup-card{
+        height:115px !important;
+      }
+      .img-wrap{
+        width:105px !important;
+        flex-basis:105px !important;
+        height:115px !important;
+      }
+      .popup-body{
+        flex:0 0 105px !important;
+        min-width:105px !important;
+        max-width:105px !important;
+        padding:4px 6px !important;
+      }
+      /* ↓ fonts reduced by 1px on mobile */
+      .popup-heading{ font-size:9.5px !important }
+      .specs{ font-size:8.5px !important }
+      .spec-value{ font-size:9.5px !important }
+      .popup-link{ font-size:10px !important }
+
       .icon{ width:11px !important; height:11px !important }
       .icon-img{ width:9px !important; height:9px !important }
     }
   </style>
 </head>
+
 <body>
 <div id="map"></div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
+
 <script>
 mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
 const RED="#EC2629", BLUE="#3899EC";
+
 const IMG={
   derwent:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/derwent-dam-tower.jpg",
   crashed:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/b29-overexposed-crash-site.jpg",
@@ -119,29 +165,35 @@ const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-/* iOS FS button (unchanged) */
 function isIOS(){
   const ua = navigator.userAgent || "";
   const platform = navigator.platform || "";
   return /iPad|iPhone|iPod/.test(ua) || (platform==="MacIntel" && navigator.maxTouchPoints>1);
 }
+
 const params = new URLSearchParams(location.search);
+
 if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
-  const hideMbFs=()=>{ const mb=document.querySelector('.mapboxgl-ctrl-fullscreen'); if(mb) mb.style.display='none'; };
-  hideMbFs(); setTimeout(hideMbFs, 500);
+  const hide=()=>{ const el=document.querySelector('.mapboxgl-ctrl-fullscreen'); if(el) el.style.display='none'; };
+  hide(); setTimeout(hide,500);
 }
+
 function addIOSFullscreenButton(){
-  if(!isIOS() || params.get("fs")==="1") return;
-  const corner = map.getContainer().querySelector('.mapboxgl-ctrl-bottom-right');
+  if(!isIOS()) return;
+  if(params.get("fs")==="1") return;
+
+  const corner = document.querySelector('.mapboxgl-ctrl-bottom-right');
   if(!corner) return;
-  const navGroup = Array.from(corner.querySelectorAll('.mapboxgl-ctrl-group'))
+
+  const navGroup = [...corner.querySelectorAll('.mapboxgl-ctrl-group')]
     .find(g => g.querySelector('.mapboxgl-ctrl-zoom-in'));
+
   if(!navGroup) return;
+
   const btn=document.createElement('button');
   btn.className='mapboxgl-ctrl-icon ios-fs-btn';
   btn.id='iosFullscreenBtn';
-  btn.setAttribute('aria-label','Fullscreen');
   btn.innerHTML = `
     <svg viewBox="0 0 24 24">
       <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2"/>
@@ -149,18 +201,25 @@ function addIOSFullscreenButton(){
       <polyline points="4,15 4,20 9,20" fill="none" stroke="#000" stroke-width="2"/>
       <polyline points="20,15 20,20 15,20" fill="none" stroke="#000" stroke-width="2"/>
     </svg>`;
+
   const zoomOut = navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
   const compass = navGroup.querySelector('.mapboxgl-ctrl-compass');
-  if(zoomOut){ navGroup.insertBefore(btn, compass || zoomOut.nextSibling); } else { navGroup.appendChild(btn); }
-  btn.addEventListener('click',()=>{
-    const url=new URL(window.location.href);
+
+  if(zoomOut){
+    navGroup.insertBefore(btn, compass || zoomOut.nextSibling);
+  } else {
+    navGroup.appendChild(btn);
+  }
+
+  btn.onclick = ()=>{
+    const url=new URL(location.href);
     url.searchParams.set("fs","1");
-    window.open(url.toString(), "_blank");
-  });
+    window.open(url.toString(),"_blank");
+  };
 }
+
 map.on('load', addIOSFullscreenButton);
 
-/* Popup icons */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -187,7 +246,7 @@ function specsHTML(s,u){
 function popupHtmlFor(h){
   return `
     <div class="popup-card">
-      <div class="img-wrap"><img src="${h.photo}" alt="${h.name}"></div>
+      <div class="img-wrap"><img src="${h.photo}"></div>
       <div class="popup-body">
         <div class="popup-heading">${h.name}</div>
         ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
@@ -195,59 +254,25 @@ function popupHtmlFor(h){
     </div>`;
 }
 
-/* Smoothly centre the popup (both axes) on mobile */
-function centrePopupSmooth(popup){
-  if (window.innerWidth >= 600) return;
-
-  // ensure DOM is painted
-  requestAnimationFrame(()=>{
-    const el = popup.getElement();
-    if(!el) return;
-
-    const card = el.querySelector('.popup-card');
-    if(!card) return;
-
-    const cardRect = card.getBoundingClientRect();
-    const mRect = map.getContainer().getBoundingClientRect();
-
-    // marker position in pixels
-    const p = map.project(popup.getLngLat());
-
-    // popup visual centre relative to marker (anchor at bottom, tip removed, 22px offset used)
-    const popupCenterX = p.x;                                   // horizontally centred over marker
-    const popupCenterY = p.y - (cardRect.height / 2 + 22);      // vertically above marker
-
-    // desired centre = map viewport centre
-    const targetX = mRect.width / 2;
-    const targetY = mRect.height / 2;
-
-    const dx = targetX - popupCenterX;
-    const dy = targetY - popupCenterY;
-
-    map.easeTo({
-      center: popup.getLngLat(),
-      offset: [dx, dy],                 // moves so the popup centre hits viewport centre
-      duration: 900,                    // smoother, longer
-      easing: t => 1 - Math.pow(1 - t, 3) // smooth cubic ease-out
-    });
-  });
-}
-
 async function loadGpx(url){
   const res=await fetch(url);
-  const text=await res.text();
-  const xml=new DOMParser().parseFromString(text,"text/xml");
+  const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
   const gj=toGeoJSON.gpx(xml);
-  return gj.features.find(f=>f.geometry && f.geometry.type==="LineString");
+  return gj.features.find(f=>f.geometry?.type==="LineString");
 }
 
 function addRoute(id,line){
-  const src=`route-src-${id}`, lyr=`route-lyr-${id}`;
-  if(!map.getSource(src)) map.addSource(src,{type:"geojson",data:line});
-  if(!map.getLayer(lyr)){
-    map.addLayer({ id:lyr, type:"line", source:src,
-      paint:{ "line-color":RED, "line-width":3, "line-opacity":0.95 }});
-  }
+  const src=`route-src-${id}`;
+  const lyr=`route-lyr-${id}`;
+  if(!map.getSource(src))
+    map.addSource(src,{type:"geojson",data:line});
+  if(!map.getLayer(lyr))
+    map.addLayer({
+      id:lyr,
+      type:"line",
+      source:src,
+      paint:{ "line-color":RED,"line-width":3,"line-opacity":0.95 }
+    });
   return lyr;
 }
 
@@ -255,8 +280,22 @@ map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
   hikes.forEach(h=>{
-    const popup = new mapboxgl.Popup({ offset:22, closeButton:false }).setHTML(popupHtmlFor(h));
-    popup.on('open', ()=> centrePopupSmooth(popup));
+    const popup = new mapboxgl.Popup({
+      offset:22,
+      closeButton:false
+    }).setHTML(popupHtmlFor(h));
+
+    // keep the simple recentre on mobile
+    popup.on('open', () => {
+      if (window.innerWidth < 600) {
+        const markerLngLat = popup.getLngLat();
+        map.easeTo({
+          center: markerLngLat,
+          offset: [0, -80],
+          duration: 400
+        });
+      }
+    });
 
     new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
@@ -273,20 +312,19 @@ map.on("load", async () => {
         addRoute(h.id,line);
         line.geometry.coordinates.forEach(c=>bounds.extend(c));
       }
-    }catch(e){}
+    }catch{}
   }));
 
   const isMobile = window.innerWidth < 600;
-  const mobileMaxZoom = 11.6;
 
   map.fitBounds(bounds,{
     padding: isMobile ? 30 : 110,
     maxZoom: isMobile ? 14 : 11
   });
 
-  if (isMobile) {
-    map.once('idle', () => {
-      if (map.getZoom() > mobileMaxZoom) map.setZoom(mobileMaxZoom);
+  if(isMobile){
+    map.once("idle",()=>{
+      if(map.getZoom()>11.6) map.setZoom(11.6);
     });
   }
 });
