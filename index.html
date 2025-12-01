@@ -10,6 +10,7 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
+    /* hide mapbox attribution (shown elsewhere) */
     .mapboxgl-ctrl-logo,
     .mapboxgl-ctrl-attrib,
     .mapboxgl-ctrl-attrib-inner { display:none !important; visibility:hidden !important; }
@@ -47,9 +48,18 @@
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; }
 
+    /* Remove iOS blue focus ring / tap highlight on links inside popup */
+    .popup-link:focus,
+    .popup-link:focus-visible,
+    .popup-link:active { outline:none !important; box-shadow:none !important; }
+    .popup-link { -webkit-tap-highlight-color: transparent; }
+    a:focus { outline: none; }
+
+    /* iOS fullscreen page mode */
     body.ios-fullscreen #map{ position:fixed; inset:0; z-index:1; background:#000 }
     body.ios-fullscreen .mapboxgl-ctrl-bottom-right{ z-index:2 }
 
+    /* iOS fullscreen button look (matches Mapbox group) */
     .mapboxgl-ctrl-group > button.ios-fs-btn{
       background:#fff !important;
       outline:none !important;
@@ -62,29 +72,28 @@
       background:rgba(0,0,0,.1) !important;
     }
 
+    /* Keep the button in-flow so separators render; nudge ONLY the icon */
     #iosFullscreenBtn{ position:static; }
-
-    /* icon micro-nudge (unchanged) */
     #iosFullscreenBtn svg{
       display:block; width:20px; height:20px; margin:0 auto;
       transform: translate(-0.35px, 0.2px);
     }
 
-    /* MOBILE — make popup smaller again */
+    /* MOBILE — make popup smaller again (with !important to beat desktop sizes) */
     @media (max-width:440px){
-      .popup-card{ height:138px }                         /* smaller overall height */
-      .img-wrap{ width:100px; flex-basis:100px }          /* narrower image panel */
+      .popup-card{ height:126px !important }
+      .img-wrap{ width:96px !important; flex-basis:96px !important }
       .popup-body{
-        padding:5px 8px 7px 7px;
-        flex:0 0 118px; min-width:118px; max-width:118px; /* narrower content panel */
+        padding:5px 8px 6px 7px !important;
+        flex:0 0 112px !important; min-width:112px !important; max-width:112px !important;
       }
-      .popup-heading{ font-size:9.5px; margin:0 0 4px 0 }
-      .specs{ font-size:8.5px; gap:2px; margin-top:0; transform:none }
-      .spec-row{ gap:3px }
-      .spec-value{ font-size:9.5px }
-      .popup-link{ font-size:10px }
-      .icon{ width:12px; height:12px }
-      .icon-img{ width:10px; height:10px }
+      .popup-heading{ font-size:9.5px !important; margin:0 0 4px 0 !important }
+      .specs{ font-size:8.5px !important; gap:2px !important; margin-top:0 !important; transform:none !important }
+      .spec-row{ gap:3px !important }
+      .spec-value{ font-size:9.5px !important }
+      .popup-link{ font-size:10px !important }
+      .icon{ width:12px !important; height:12px !important }
+      .icon-img{ width:10px !important; height:10px !important }
     }
   </style>
 </head>
@@ -131,11 +140,13 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
+/* Desktop + Android controls */
 const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 const fs = new mapboxgl.FullscreenControl();
 map.addControl(fs, "bottom-right");
 
+/* iOS detection and query */
 function isIOS(){
   const ua = navigator.userAgent || "";
   const platform = navigator.platform || "";
@@ -145,12 +156,14 @@ function isIOS(){
 }
 const params = new URLSearchParams(location.search);
 
+/* If opened as ?fs=1 on iOS, go page-fullscreen and hide native FS control */
 if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
   const hideMbFs=()=>{ const mb=document.querySelector('.mapboxgl-ctrl-fullscreen'); if(mb) mb.style.display='none'; };
   hideMbFs(); setTimeout(hideMbFs, 500);
 }
 
+/* iOS custom fullscreen button (black icon) directly inside the Mapbox control group */
 function addIOSFullscreenButton(){
   if(!isIOS()) return;
   if(params.get("fs")==="1") return;
@@ -195,6 +208,7 @@ function addIOSFullscreenButton(){
 
 map.on('load', ()=>{ addIOSFullscreenButton(); });
 
+/* Popup icons */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
