@@ -10,6 +10,7 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
+    /* hide mapbox attribution (you show it elsewhere) */
     .mapboxgl-ctrl-logo,
     .mapboxgl-ctrl-attrib,
     .mapboxgl-ctrl-attrib-inner { display:none !important; visibility:hidden !important; }
@@ -51,7 +52,7 @@
     body.ios-fullscreen #map{ position:fixed; inset:0; z-index:1; background:#000 }
     body.ios-fullscreen .mapboxgl-ctrl-bottom-right{ z-index:2 }
 
-    /* iOS fullscreen button look */
+    /* iOS fullscreen button look (matches Mapbox group) */
     .mapboxgl-ctrl-group > button.ios-fs-btn{
       background:#fff !important;
       outline:none !important;
@@ -63,13 +64,12 @@
     .mapboxgl-ctrl-group > button.ios-fs-btn:active{
       background:rgba(0,0,0,.1) !important;
     }
-    .ios-fs-btn svg{ display:block; width:20px; height:20px; margin:0 auto; }
 
-    /* Nudge only the fullscreen button to line up */
-    #iosFullscreenBtn{
-      position:relative;
-      top:3px;     /* down by 3px */
-      left:0;      /* no horizontal nudge */
+    /* Keep the button in-flow so separators render; nudge ONLY the icon */
+    #iosFullscreenBtn{ position:static; }
+    #iosFullscreenBtn svg{
+      display:block; width:20px; height:20px; margin:0 auto;
+      transform: translate(-1px, 2px); /* left 1px, down 2px */
     }
 
     @media (max-width:440px){
@@ -119,7 +119,7 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
-/* Desktop and Android controls */
+/* Desktop + Android controls */
 const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 const fs = new mapboxgl.FullscreenControl();
@@ -142,7 +142,7 @@ if(isIOS() && params.get("fs")==="1"){
   hideMbFs(); setTimeout(hideMbFs, 500);
 }
 
-/* iOS custom fullscreen button (black icon) directly inside existing group */
+/* iOS custom fullscreen button (black icon) directly inside the Mapbox control group */
 function addIOSFullscreenButton(){
   if(!isIOS()) return;
   if(params.get("fs")==="1") return;
@@ -164,7 +164,7 @@ function addIOSFullscreenButton(){
   btn.setAttribute('aria-label','Fullscreen');
 
   btn.innerHTML = `
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
       <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
       <polyline points="20,9 20,4 15,4" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
       <polyline points="4,15 4,20 9,20" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
@@ -172,6 +172,7 @@ function addIOSFullscreenButton(){
     </svg>
   `;
 
+  /* insert after zoom-out but before compass (same as desktop merge) */
   if(zoomOut){
     navGroup.insertBefore(btn, compass ? compass : zoomOut.nextSibling);
   }else{
@@ -187,7 +188,7 @@ function addIOSFullscreenButton(){
 
 map.on('load', ()=>{ addIOSFullscreenButton(); });
 
-/* Icons for popup content */
+/* Popup icons */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
