@@ -64,10 +64,10 @@
 
     #iosFullscreenBtn{ position:static; }
 
-    /* ONLY CHANGE YOU REQUESTED */
+    /* ONLY CHANGE: right 0.5px and down 0.5px */
     #iosFullscreenBtn svg{
       display:block; width:20px; height:20px; margin:0 auto;
-      transform: translate(-1px, -1px);
+      transform: translate(0.5px, 0.5px);
     }
 
     @media (max-width:440px){
@@ -97,11 +97,13 @@ const hikes=[
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
     photo:IMG.derwent, specs:{ duration:"3 to 4 hours", length:"7.4 miles", ascent:"367m" } },
+
   { id:"crashed-plane", name:"Crashed Plane Hike", coords:[-1.8689,53.4329],
     hikeUrl:"https://thelostpeak.co.uk/hikes/crashed-plane",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
     photo:IMG.crashed, specs:{ duration:"2 to 3 hours", length:"3.6 miles", ascent:"145m" } },
+
   { id:"kinder-scout", name:"Kinder Scout", coords:[-1.8151209383535991,53.364872107766416],
     hikeUrl:"https://thelostpeak.co.uk/hikes/kinder-scout",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
