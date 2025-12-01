@@ -64,15 +64,25 @@
 
     #iosFullscreenBtn{ position:static; }
 
-    /* ONLY CHANGE: move icon left 0.25px */
+    /* current tiny nudge from your latest */
     #iosFullscreenBtn svg{
       display:block; width:20px; height:20px; margin:0 auto;
       transform: translate(-0.35px, 0.2px);
     }
 
+    /* MOBILE-ONLY TIGHTER POPUP */
     @media (max-width:440px){
-      .img-wrap{ width:120px; flex-basis:120px }
-      .popup-card{ min-width:290px; max-width:320px; height:190px }
+      .popup-card{ height:150px }                 /* down from 190 */
+      .img-wrap{ width:108px; flex-basis:108px }  /* down from 120 */
+      .popup-body{
+        padding:6px 10px 8px 8px;
+        flex:0 0 128px; min-width:128px; max-width:128px;  /* down from 140 */
+      }
+      .popup-heading{ font-size:10px; margin:1px 0 5px 0 }
+      .specs{ font-size:9px; gap:2px; margin-top:1px; transform:none }
+      .spec-value{ font-size:10px }
+      .icon{ width:14px; height:14px }
+      .icon-img{ width:11px; height:11px }
     }
   </style>
 </head>
