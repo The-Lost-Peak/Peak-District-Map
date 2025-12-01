@@ -64,10 +64,11 @@
       transform:translateY(-1px);
     }
 
-    .popup-heading{ font-weight:800; font-size:11px; margin:2px 0 6px 0; color:#1E1E1E }
+    /* +2px increase */
+    .popup-heading{ font-weight:800; font-size:13px; margin:2px 0 6px 0; color:#1E1E1E }
 
     .specs{
-      font-size:10px;
+      font-size:12px;
       display:flex;
       flex-direction:column;
       gap:3px;
@@ -105,8 +106,9 @@
       filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
     }
 
-    .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
-    .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none; }
+    .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
+
+    .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none; }
     a:focus{ outline:none !important; }
 
     #iosFullscreenBtn svg{
@@ -115,9 +117,10 @@
       margin:0 auto;
     }
 
+
     /* ============================================================
-       MOBILE: IMAGE WIDTH = TEXT WIDTH = 105px
-       POPUP SMALLER & BALANCED
+       MOBILE SECTION — SAME WIDTH IMAGE + TEXT (105px)
+       POPUP SMALLER — FONT NOW +2PX INCREASE
        ============================================================ */
     @media (max-width:440px){
 
@@ -138,20 +141,21 @@
         padding:4px 6px !important;
       }
 
+      /* +2px increase */
       .popup-heading{
-        font-size:8.5px !important;
+        font-size:10.5px !important;
         margin:1px 0 3px 0 !important;
       }
 
       .specs{
-        font-size:7.5px !important;
+        font-size:9.5px !important;
         gap:2px !important;
         margin-top:1px !important;
       }
 
       .spec-row{ gap:3px !important; }
-      .spec-value{ font-size:8.5px !important; }
-      .popup-link{ font-size:9px !important; }
+      .spec-value{ font-size:10.5px !important; }
+      .popup-link{ font-size:11px !important; }
 
       .icon{ width:11px !important; height:11px !important }
       .icon-img{ width:9px !important; height:9px !important }
@@ -204,7 +208,6 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
-/* Desktop controls */
 const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
@@ -311,9 +314,12 @@ function addRoute(id,line){
   if(!map.getSource(src))
     map.addSource(src,{type:"geojson",data:line});
   if(!map.getLayer(lyr))
-    map.addLayer({id:lyr,type:"line",source:src,paint:{
-      "line-color":RED,"line-width":3,"line-opacity":0.95
-    }});
+    map.addLayer({
+      id:lyr,
+      type:"line",
+      source:src,
+      paint:{ "line-color":RED,"line-width":3,"line-opacity":0.95 }
+    });
   return lyr;
 }
 
