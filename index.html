@@ -64,42 +64,14 @@
       transform:translateY(-1px);
     }
 
-    /* +2px increase */
     .popup-heading{ font-weight:800; font-size:13px; margin:2px 0 6px 0; color:#1E1E1E }
+    .specs{ font-size:12px; display:flex; flex-direction:column; gap:3px; align-items:center; margin-top:2px }
+    .stats-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
+    .links-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
 
-    .specs{
-      font-size:12px;
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-      align-items:center;
-      margin-top:2px;
-    }
-
-    .stats-group{
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-      align-items:center;
-    }
-
-    .links-group{
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-      align-items:center;
-    }
-
-    .spec-row{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:4px;
-    }
-
+    .spec-row{ display:flex; align-items:center; justify-content:center; gap:4px }
     .icon{ width:16px; height:16px }
-    .icon-red{ color:#EC2629 }
-    .icon-blue{ color:#3899EC }
+    .icon-red{ color:#EC2629 } .icon-blue{ color:#3899EC }
 
     .icon-img{
       width:12px; height:12px; display:block;
@@ -107,7 +79,6 @@
     }
 
     .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
-
     .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none; }
     a:focus{ outline:none !important; }
 
@@ -117,46 +88,26 @@
       margin:0 auto;
     }
 
-
-    /* ============================================================
-       MOBILE SECTION — SAME WIDTH IMAGE + TEXT (105px)
-       POPUP SMALLER — FONT NOW +2PX INCREASE
-       ============================================================ */
+    /* MOBILE POPUP DIMENSIONS */
     @media (max-width:440px){
-
       .popup-card{
         height:115px !important;
       }
-
       .img-wrap{
         width:105px !important;
         flex-basis:105px !important;
         height:115px !important;
       }
-
       .popup-body{
         flex:0 0 105px !important;
         min-width:105px !important;
         max-width:105px !important;
         padding:4px 6px !important;
       }
-
-      /* +2px increase */
-      .popup-heading{
-        font-size:10.5px !important;
-        margin:1px 0 3px 0 !important;
-      }
-
-      .specs{
-        font-size:9.5px !important;
-        gap:2px !important;
-        margin-top:1px !important;
-      }
-
-      .spec-row{ gap:3px !important; }
-      .spec-value{ font-size:10.5px !important; }
-      .popup-link{ font-size:11px !important; }
-
+      .popup-heading{ font-size:10.5px !important }
+      .specs{ font-size:9.5px !important }
+      .spec-value{ font-size:10.5px !important }
+      .popup-link{ font-size:11px !important }
       .icon{ width:11px !important; height:11px !important }
       .icon-img{ width:9px !important; height:9px !important }
     }
@@ -327,10 +278,28 @@ map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
   hikes.forEach(h=>{
+    const popup = new mapboxgl.Popup({
+      offset:22,
+      closeButton:false
+    }).setHTML(popupHtmlFor(h));
+
+    // ⭐ NEW: automatically centre popup on mobile
+    popup.on('open', () => {
+      if (window.innerWidth < 600) {
+        const markerLngLat = popup.getLngLat();
+        map.easeTo({
+          center: markerLngLat,
+          offset: [0, -80],    // move popup upward so fully visible
+          duration: 400
+        });
+      }
+    });
+
     new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
-      .setPopup(new mapboxgl.Popup({offset:22,closeButton:false}).setHTML(popupHtmlFor(h)))
+      .setPopup(popup)
       .addTo(map);
+
     bounds.extend(h.coords);
   });
 
