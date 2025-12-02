@@ -12,7 +12,10 @@
 
     .mapboxgl-ctrl-logo,
     .mapboxgl-ctrl-attrib,
-    .mapboxgl-ctrl-attrib-inner { display:none !important; visibility:hidden !important; }
+    .mapboxgl-ctrl-attrib-inner {
+      display:none !important;
+      visibility:hidden !important;
+    }
 
     .marker{ cursor:pointer !important }
     .marker svg{ transform:scale(0.85); transform-origin:center }
@@ -21,8 +24,14 @@
     .mapboxgl-popup-tip{ display:none !important }
 
     .mapboxgl-popup-content{
-      background:transparent !important; border:none !important; padding:0 !important; box-shadow:none !important;
-      width:auto !important; overflow:visible !important; display:block; box-sizing:border-box;
+      background:transparent !important;
+      border:none !important;
+      padding:0 !important;
+      box-shadow:none !important;
+      width:auto !important;
+      overflow:visible !important;
+      display:block;
+      box-sizing:border-box;
       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
       text-transform:capitalize;
     }
@@ -38,24 +47,20 @@
     }
 
     .img-wrap{
-      width:140px;
-      flex:0 0 140px;
-      height:100%;
+      width:140px; flex:0 0 140px; height:100%;
       border-radius:12px 0 0 12px;
-      overflow:hidden;
-      background:#000;
+      overflow:hidden; background:#000;
     }
+
     .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block }
 
     .popup-body{
       box-sizing:border-box;
       padding:8px 12px 10px 10px;
       flex:0 0 140px;
-      min-width:140px;
-      max-width:140px;
+      min-width:140px; max-width:140px;
       text-align:center;
-      display:flex;
-      flex-direction:column;
+      display:flex; flex-direction:column;
       justify-content:center;
       line-height:1.2;
       transform:translateY(-1px);
@@ -65,10 +70,17 @@
     .specs{ font-size:12px; display:flex; flex-direction:column; gap:3px; align-items:center; margin-top:2px }
     .stats-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
     .links-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
+
     .spec-row{ display:flex; align-items:center; justify-content:center; gap:4px }
     .icon{ width:16px; height:16px }
-    .icon-red{ color:#EC2629 } .icon-blue{ color:#3899EC }
-    .icon-img{ width:12px; height:12px; display:block; filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%) }
+    .icon-red{ color:#EC2629 }
+    .icon-blue{ color:#3899EC }
+
+    .icon-img{
+      width:12px; height:12px; display:block;
+      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
+    }
+
     .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
     .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none }
     a:focus{ outline:none !important }
@@ -79,11 +91,18 @@
       margin:0 auto;
     }
 
-    /* ===== MOBILE (normal embedded view) ===== */
+    /* ===== MOBILE NORMAL POPUP ===== */
     @media (max-width:440px){
       .popup-card{ height:115px !important }
       .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
-      .popup-body{ flex:0 0 105px !important; min-width:105px !important; max-width:105px !important; padding:4px 6px !important }
+      .popup-body{
+        flex:0 0 105px !important;
+        min-width:105px !important;
+        max-width:105px !important;
+        padding:4px 6px !important;
+      }
+
+      /* base mobile sizes */
       .popup-heading{ font-size:9.5px !important }
       .specs{ font-size:8.5px !important }
       .spec-value{ font-size:9.5px !important }
@@ -92,8 +111,7 @@
       .icon-img{ width:9px !important; height:9px !important }
     }
 
-    /* ===== iPhone pop-out fullscreen ONLY (?fs=1 adds .ios-fullscreen) =====
-       Increase popup width & height by 10% and text sizes by +1px, mobile only */
+    /* ===== FULLSCREEN IPHONE POP OUT — ONLY CHANGE HERE ===== */
     @media (max-width:440px){
       body.ios-fullscreen .popup-card{
         height:calc(115px * 1.10) !important;
@@ -107,13 +125,22 @@
         flex:0 0 calc(105px * 1.10) !important;
         min-width:calc(105px * 1.10) !important;
         max-width:calc(105px * 1.10) !important;
-        /* keep padding the same for alignment */
       }
-      /* +1px text sizes in fullscreen */
-      body.ios-fullscreen .popup-heading{ font-size:calc(9.5px + 1px) !important }
-      body.ios-fullscreen .specs{ font-size:calc(8.5px + 1px) !important }
-      body.ios-fullscreen .spec-value{ font-size:calc(9.5px + 1px) !important }
-      body.ios-fullscreen .popup-link{ font-size:calc(10px + 1px) !important }
+
+      /* ⭐ ALL TEXT +1px ABOVE CURRENT MOBILE SIZE ⭐ */
+
+      body.ios-fullscreen .popup-heading{
+        font-size:calc(9.5px + 1px) !important;
+      }
+      body.ios-fullscreen .specs{
+        font-size:calc(8.5px + 1px) !important;
+      }
+      body.ios-fullscreen .spec-value{
+        font-size:calc(9.5px + 1px) !important;
+      }
+      body.ios-fullscreen .popup-link{
+        font-size:calc(10px + 1px) !important;
+      }
     }
   </style>
 </head>
@@ -136,23 +163,36 @@ const IMG={
 };
 
 const hikes=[
-  { id:"derwent-edge", name:"Derwent Edge", coords:[-1.7427849606990842,53.400582126300236],
+  {
+    id:"derwent-edge",
+    name:"Derwent Edge",
+    coords:[-1.7427849606990842,53.400582126300236],
     hikeUrl:"https://thelostpeak.co.uk/hikes/derwent-edge",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
-    photo:IMG.derwent, specs:{ duration:"3 to 4 hours", length:"7.4 miles", ascent:"367m" } },
-
-  { id:"crashed-plane", name:"Crashed Plane Hike", coords:[-1.8689,53.4329],
+    photo:IMG.derwent,
+    specs:{ duration:"3 to 4 hours", length:"7.4 miles", ascent:"367m" }
+  },
+  {
+    id:"crashed-plane",
+    name:"Crashed Plane Hike",
+    coords:[-1.8689,53.4329],
     hikeUrl:"https://thelostpeak.co.uk/hikes/crashed-plane",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
-    photo:IMG.crashed, specs:{ duration:"2 to 3 hours", length:"3.6 miles", ascent:"145m" } },
-
-  { id:"kinder-scout", name:"Kinder Scout", coords:[-1.8151209383535991,53.364872107766416],
+    photo:IMG.crashed,
+    specs:{ duration:"2 to 3 hours", length:"3.6 miles", ascent:"145m" }
+  },
+  {
+    id:"kinder-scout",
+    name:"Kinder Scout",
+    coords:[-1.8151209383535991,53.364872107766416],
     hikeUrl:"https://thelostpeak.co.uk/hikes/kinder-scout",
     directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
     gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx",
-    photo:IMG.kinder, specs:{ duration:"4 to 6 hours", length:"8.3 miles", ascent:"562m" } }
+    photo:IMG.kinder,
+    specs:{ duration:"4 to 6 hours", length:"8.3 miles", ascent:"562m" }
+  }
 ];
 
 const map=new mapboxgl.Map({
@@ -173,11 +213,14 @@ function isIOS(){
   return /iPad|iPhone|iPod/.test(ua) || (platform==="MacIntel" && navigator.maxTouchPoints>1);
 }
 
-const params = new URLSearchParams(location.search);
+const params=new URLSearchParams(location.search);
 
 if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
-  const hide=()=>{ const el=document.querySelector('.mapboxgl-ctrl-fullscreen'); if(el) el.style.display='none'; };
+  const hide=()=>{
+    const el=document.querySelector('.mapboxgl-ctrl-fullscreen');
+    if(el) el.style.display='none';
+  };
   hide(); setTimeout(hide,500);
 }
 
@@ -185,18 +228,18 @@ function addIOSFullscreenButton(){
   if(!isIOS()) return;
   if(params.get("fs")==="1") return;
 
-  const corner = document.querySelector('.mapboxgl-ctrl-bottom-right');
+  const corner=document.querySelector('.mapboxgl-ctrl-bottom-right');
   if(!corner) return;
 
-  const navGroup = [...corner.querySelectorAll('.mapboxgl-ctrl-group')]
-    .find(g => g.querySelector('.mapboxgl-ctrl-zoom-in'));
+  const navGroup=[...corner.querySelectorAll('.mapboxgl-ctrl-group')]
+    .find(g=>g.querySelector('.mapboxgl-ctrl-zoom-in'));
 
   if(!navGroup) return;
 
   const btn=document.createElement('button');
   btn.className='mapboxgl-ctrl-icon ios-fs-btn';
   btn.id='iosFullscreenBtn';
-  btn.innerHTML = `
+  btn.innerHTML=`
     <svg viewBox="0 0 24 24">
       <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2"/>
       <polyline points="20,9 20,4 15,4" fill="none" stroke="#000" stroke-width="2"/>
@@ -204,8 +247,8 @@ function addIOSFullscreenButton(){
       <polyline points="20,15 20,20 15,20" fill="none" stroke="#000" stroke-width="2"/>
     </svg>`;
 
-  const zoomOut = navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
-  const compass = navGroup.querySelector('.mapboxgl-ctrl-compass');
+  const zoomOut=navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
+  const compass=navGroup.querySelector('.mapboxgl-ctrl-compass');
 
   if(zoomOut){
     navGroup.insertBefore(btn, compass || zoomOut.nextSibling);
@@ -213,7 +256,7 @@ function addIOSFullscreenButton(){
     navGroup.appendChild(btn);
   }
 
-  btn.onclick = ()=>{
+  btn.onclick=()=>{
     const url=new URL(location.href);
     url.searchParams.set("fs","1");
     window.open(url.toString(),"_blank");
@@ -282,16 +325,15 @@ map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
   hikes.forEach(h=>{
-    const popup = new mapboxgl.Popup({
+    const popup=new mapboxgl.Popup({
       offset:22,
       closeButton:false
     }).setHTML(popupHtmlFor(h));
 
-    // keep the simple recentre on mobile
-    popup.on('open', () => {
-      if (window.innerWidth < 600) {
-        const markerLngLat = popup.getLngLat();
-        map.easeTo({ center: markerLngLat, offset: [0, -80], duration: 400 });
+    popup.on('open',()=>{
+      if(window.innerWidth<600){
+        const ll=popup.getLngLat();
+        map.easeTo({ center:ll, offset:[0,-80], duration:400 });
       }
     });
 
@@ -313,11 +355,11 @@ map.on("load", async () => {
     }catch{}
   }));
 
-  const isMobile = window.innerWidth < 600;
+  const isMobile=window.innerWidth<600;
 
   map.fitBounds(bounds,{
-    padding: isMobile ? 30 : 110,
-    maxZoom: isMobile ? 14 : 11
+    padding:isMobile?30:110,
+    maxZoom:isMobile?14:11
   });
 
   if(isMobile){
