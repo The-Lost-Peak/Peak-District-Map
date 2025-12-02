@@ -79,28 +79,41 @@
       margin:0 auto;
     }
 
-    /* MOBILE POPUP DIMENSIONS */
+    /* ===== MOBILE (normal embedded view) ===== */
     @media (max-width:440px){
       .popup-card{ height:115px !important }
-      .img-wrap{
-        width:105px !important;
-        flex-basis:105px !important;
-        height:115px !important;
-      }
-      /* make the TEXT column slightly wider to visually match the image column */
-      .popup-body{
-        flex:0 0 108px !important;
-        min-width:108px !important;
-        max-width:108px !important;
-        padding:4px 6px !important;
-      }
-      /* fonts reduced by 1px on mobile (as previously set) */
+      .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
+      .popup-body{ flex:0 0 105px !important; min-width:105px !important; max-width:105px !important; padding:4px 6px !important }
       .popup-heading{ font-size:9.5px !important }
       .specs{ font-size:8.5px !important }
       .spec-value{ font-size:9.5px !important }
       .popup-link{ font-size:10px !important }
       .icon{ width:11px !important; height:11px !important }
       .icon-img{ width:9px !important; height:9px !important }
+    }
+
+    /* ===== iPhone pop-out fullscreen ONLY (?fs=1 adds .ios-fullscreen) =====
+       Increase popup width & height by 10% and text sizes by +1px, mobile only */
+    @media (max-width:440px){
+      body.ios-fullscreen .popup-card{
+        height:calc(115px * 1.10) !important;
+      }
+      body.ios-fullscreen .img-wrap{
+        width:calc(105px * 1.10) !important;
+        flex-basis:calc(105px * 1.10) !important;
+        height:calc(115px * 1.10) !important;
+      }
+      body.ios-fullscreen .popup-body{
+        flex:0 0 calc(105px * 1.10) !important;
+        min-width:calc(105px * 1.10) !important;
+        max-width:calc(105px * 1.10) !important;
+        /* keep padding the same for alignment */
+      }
+      /* +1px text sizes in fullscreen */
+      body.ios-fullscreen .popup-heading{ font-size:calc(9.5px + 1px) !important }
+      body.ios-fullscreen .specs{ font-size:calc(8.5px + 1px) !important }
+      body.ios-fullscreen .spec-value{ font-size:calc(9.5px + 1px) !important }
+      body.ios-fullscreen .popup-link{ font-size:calc(10px + 1px) !important }
     }
   </style>
 </head>
@@ -274,6 +287,7 @@ map.on("load", async () => {
       closeButton:false
     }).setHTML(popupHtmlFor(h));
 
+    // keep the simple recentre on mobile
     popup.on('open', () => {
       if (window.innerWidth < 600) {
         const markerLngLat = popup.getLngLat();
