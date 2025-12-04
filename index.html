@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
@@ -102,7 +103,6 @@
         padding:4px 6px !important;
       }
 
-      /* base mobile sizes */
       .popup-heading{ font-size:9.5px !important }
       .specs{ font-size:8.5px !important }
       .spec-value{ font-size:9.5px !important }
@@ -111,35 +111,43 @@
       .icon-img{ width:9px !important; height:9px !important }
     }
 
-    /* ===== FULLSCREEN IPHONE POP OUT — ONLY CHANGE HERE ===== */
+    /* ===== FULLSCREEN IPHONE POP OUT — NOW 15 PERCENT BIGGER ===== */
     @media (max-width:440px){
       body.ios-fullscreen .popup-card{
-        height:calc(115px * 1.10) !important;
+        height:calc(115px * 1.15) !important;
       }
       body.ios-fullscreen .img-wrap{
-        width:calc(105px * 1.10) !important;
-        flex-basis:calc(105px * 1.10) !important;
-        height:calc(115px * 1.10) !important;
+        width:calc(105px * 1.15) !important;
+        flex-basis:calc(105px * 1.15) !important;
+        height:calc(115px * 1.15) !important;
       }
       body.ios-fullscreen .popup-body{
-        flex:0 0 calc(105px * 1.10) !important;
-        min-width:calc(105px * 1.10) !important;
-        max-width:calc(105px * 1.10) !important;
+        flex:0 0 calc(105px * 1.15) !important;
+        min-width:calc(105px * 1.15) !important;
+        max-width:calc(105px * 1.15) !important;
+        padding:calc(4px * 1.15) calc(6px * 1.15) !important;
       }
-
-      /* ⭐ ALL TEXT +1px ABOVE CURRENT MOBILE SIZE ⭐ */
 
       body.ios-fullscreen .popup-heading{
-        font-size:calc(9.5px + 1px) !important;
+        font-size:calc(9.5px * 1.15) !important;
       }
       body.ios-fullscreen .specs{
-        font-size:calc(8.5px + 1px) !important;
+        font-size:calc(8.5px * 1.15) !important;
       }
       body.ios-fullscreen .spec-value{
-        font-size:calc(9.5px + 1px) !important;
+        font-size:calc(9.5px * 1.15) !important;
       }
       body.ios-fullscreen .popup-link{
-        font-size:calc(10px + 1px) !important;
+        font-size:calc(10px * 1.15) !important;
+      }
+
+      body.ios-fullscreen .icon{
+        width:calc(11px * 1.15) !important;
+        height:calc(11px * 1.15) !important;
+      }
+      body.ios-fullscreen .icon-img{
+        width:calc(9px * 1.15) !important;
+        height:calc(9px * 1.15) !important;
       }
     }
   </style>
