@@ -111,28 +111,43 @@
       .icon-img{ width:9px !important; height:9px !important }
     }
 
-    /* ===== FULLSCREEN IPHONE POP OUT — TEXT ONLY +1px ===== */
+    /* ===== FULLSCREEN IPHONE POP OUT — NOW 15 PERCENT BIGGER ===== */
     @media (max-width:440px){
+      body.ios-fullscreen .popup-card{
+        height:calc(115px * 1.15) !important;
+      }
+      body.ios-fullscreen .img-wrap{
+        width:calc(105px * 1.15) !important;
+        flex-basis:calc(105px * 1.15) !important;
+        height:calc(115px * 1.15) !important;
+      }
+      body.ios-fullscreen .popup-body{
+        flex:0 0 calc(105px * 1.15) !important;
+        min-width:calc(105px * 1.15) !important;
+        max-width:calc(105px * 1.15) !important;
+        padding:calc(4px * 1.15) calc(6px * 1.15) !important;
+      }
+
       body.ios-fullscreen .popup-heading{
-        font-size:calc(9.5px + 1px) !important;
+        font-size:calc(9.5px * 1.15) !important;
       }
       body.ios-fullscreen .specs{
-        font-size:calc(8.5px + 1px) !important;
+        font-size:calc(8.5px * 1.15) !important;
       }
       body.ios-fullscreen .spec-value{
-        font-size:calc(9.5px + 1px) !important;
+        font-size:calc(9.5px * 1.15) !important;
       }
       body.ios-fullscreen .popup-link{
-        font-size:calc(10px + 1px) !important;
+        font-size:calc(10px * 1.15) !important;
       }
 
       body.ios-fullscreen .icon{
-        width:calc(11px + 1px) !important;
-        height:calc(11px + 1px) !important;
+        width:calc(11px * 1.15) !important;
+        height:calc(11px * 1.15) !important;
       }
       body.ios-fullscreen .icon-img{
-        width:calc(9px + 1px) !important;
-        height:calc(9px + 1px) !important;
+        width:calc(9px * 1.15) !important;
+        height:calc(9px * 1.15) !important;
       }
     }
   </style>
@@ -196,19 +211,19 @@ const map=new mapboxgl.Map({
   attributionControl:false
 });
 
-const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
-map.addControl(nav,"bottom-right");
-map.addControl(new mapboxgl.FullscreenControl(),"bottom-right");
+const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
+map.addControl(nav, "bottom-right");
+map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
 function isIOS(){
-  const ua=navigator.userAgent||"";
-  const platform=navigator.platform||"";
-  return /iPad|iPhone|iPod/.test(ua)||(platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  const ua = navigator.userAgent || "";
+  const platform = navigator.platform || "";
+  return /iPad|iPhone|iPod/.test(ua) || (platform==="MacIntel" && navigator.maxTouchPoints>1);
 }
 
 const params=new URLSearchParams(location.search);
 
-if(isIOS()&&params.get("fs")==="1"){
+if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
   const hide=()=>{
     const el=document.querySelector('.mapboxgl-ctrl-fullscreen');
@@ -244,7 +259,7 @@ function addIOSFullscreenButton(){
   const compass=navGroup.querySelector('.mapboxgl-ctrl-compass');
 
   if(zoomOut){
-    navGroup.insertBefore(btn,compass||zoomOut.nextSibling);
+    navGroup.insertBefore(btn, compass || zoomOut.nextSibling);
   } else {
     navGroup.appendChild(btn);
   }
@@ -256,9 +271,9 @@ function addIOSFullscreenButton(){
   };
 }
 
-map.on('load',addIOSFullscreenButton);
+map.on('load', addIOSFullscreenButton);
 
-const icons={ 
+const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
   ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
@@ -309,8 +324,9 @@ function addRoute(id,line){
       id:lyr,
       type:"line",
       source:src,
-      paint:{ "line-color":"#EC2629","line-width":3,"line-opacity":0.95 }
+      paint:{ "line-color":RED,"line-width":3,"line-opacity":0.95 }
     });
+  return lyr;
 }
 
 map.on("load", async () => {
@@ -329,7 +345,7 @@ map.on("load", async () => {
       }
     });
 
-    new mapboxgl.Marker({color:"#EC2629"})
+    new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
       .setPopup(popup)
       .addTo(map);
