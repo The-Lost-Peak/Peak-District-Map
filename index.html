@@ -412,7 +412,7 @@ map.on("load", async () => {
 
   map.fitBounds(bounds,{
     padding:isMobile?30:110,
-    maxZoom:isMobile?14:10   // desktop zooms out a bit more (matches Eryri)
+    maxZoom:isMobile?14:10.5   // desktop zooms out a bit more (matches Eryri)
   });
 
   if(isMobile){
