@@ -21,8 +21,8 @@
     .marker{ cursor:pointer !important }
     .marker svg{ transform:scale(0.85); transform-origin:center }
 
-    .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
-    .mapboxgl-popup-tip{ display:none !important }
+    .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)); }
+    .mapboxgl-popup-tip{ display:none !important; }
 
     .mapboxgl-popup-content{
       background:transparent !important;
@@ -37,6 +37,7 @@
       text-transform:capitalize;
     }
 
+    /* ===== DESKTOP POPUP (match Eryri) ===== */
     .popup-card{
       display:flex;
       align-items:stretch;
@@ -46,13 +47,11 @@
       width:fit-content;
       height:130px;
     }
-
     .img-wrap{
       width:140px; flex:0 0 140px; height:100%;
       border-radius:12px 0 0 12px;
       overflow:hidden; background:#000;
     }
-
     .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block }
 
     .popup-body{
@@ -67,32 +66,25 @@
       transform:translateY(-1px);
     }
 
-    .popup-heading{ font-weight:800; font-size:13px; margin:2px 0 6px 0; color:#1E1E1E }
-    .specs{ font-size:12px; display:flex; flex-direction:column; gap:3px; align-items:center; margin-top:2px }
-    .stats-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
-    .links-group{ display:flex; flex-direction:column; gap:3px; align-items:center }
-
+    .popup-heading{ font-weight:800; font-size:11px; margin:2px 0 6px 0; color:#1E1E1E }
+    .specs{ font-size:10px; display:flex; flex-direction:column; gap:3px; align-items:center; margin-top:2px; transform:translateY(1px); }
+    .stats-group{ display:flex; flex-direction:column; gap:3px; align-items:center; transform:translateY(-2px); }
+    .links-group{ display:flex; flex-direction:column; gap:3px; align-items:center; }
     .spec-row{ display:flex; align-items:center; justify-content:center; gap:4px }
+
     .icon{ width:16px; height:16px }
     .icon-red{ color:#EC2629 }
     .icon-blue{ color:#3899EC }
-
     .icon-img{
       width:12px; height:12px; display:block;
-      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
+      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%)
     }
 
-    .spec-value{ font-weight:800; color:#EC2629; font-size:13px }
-    .popup-link{ color:#3899EC; font-weight:800; font-size:13px; text-decoration:none }
-    a:focus{ outline:none !important }
+    .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
+    .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none }
+    .hike-gap{ margin-top:2px }
 
-    #iosFullscreenBtn svg{
-      width:20px; height:20px; display:block;
-      transform:translate(-0.35px,0.2px);
-      margin:0 auto;
-    }
-
-    /* ===== MOBILE NORMAL POPUP ===== */
+    /* ===== MOBILE POPUP (same as Eryri/Peak mobile) ===== */
     @media (max-width:440px){
       .popup-card{ height:115px !important }
       .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
@@ -111,11 +103,9 @@
       .icon-img{ width:9px !important; height:9px !important }
     }
 
-    /* ===== FULLSCREEN POPUP — 15% LARGER BASE ===== */
+    /* ===== FULLSCREEN MOBILE POPUP ===== */
     @media (max-width:440px){
-      body.ios-fullscreen .popup-card{
-        height:calc(115px * 1.15) !important;
-      }
+      body.ios-fullscreen .popup-card{ height:calc(115px * 1.15) !important }
       body.ios-fullscreen .img-wrap{
         width:calc(105px * 1.15) !important;
         flex-basis:calc(105px * 1.15) !important;
@@ -128,43 +118,37 @@
         padding:calc(4px * 1.15) calc(6px * 1.15) !important;
       }
 
-      /* BASE fullscreen text (before +1px) */
       body.ios-fullscreen .popup-heading{ font-size:calc(9.5px * 1.15) !important }
       body.ios-fullscreen .specs{ font-size:calc(8.5px * 1.15) !important }
       body.ios-fullscreen .spec-value{ font-size:calc(9.5px * 1.15) !important }
       body.ios-fullscreen .popup-link{ font-size:calc(10px * 1.15) !important }
-
-      body.ios-fullscreen .icon{
-        width:calc(11px * 1.15) !important;
-        height:calc(11px * 1.15) !important;
-      }
-      body.ios-fullscreen .icon-img{
-        width:calc(9px * 1.15) !important;
-        height:calc(9px * 1.15) !important;
-      }
+      body.ios-fullscreen .icon{ width:calc(11px * 1.15) !important; height:calc(11px * 1.15) !important }
+      body.ios-fullscreen .icon-img{ width:calc(9px * 1.15) !important; height:calc(9px * 1.15) !important }
     }
 
-    /* ===== FULLSCREEN POPUP — SAFE +1PX TEXT ONLY ===== */
+    /* ===== SAFE +1PX FULLSCREEN TEXT ===== */
     @media (max-width:440px){
-
-      body.ios-fullscreen .popup-heading{
-        font-size:calc(9.5px * 1.15 + 1px) !important;
-      }
-
-      body.ios-fullscreen .specs{
-        font-size:calc(8.5px * 1.15 + 1px) !important;
-      }
-
-      body.ios-fullscreen .spec-value{
-        font-size:calc(9.5px * 1.15 + 1px) !important;
-      }
-
-      body.ios-fullscreen .popup-link{
-        font-size:calc(10px * 1.15 + 1px) !important;
-      }
-
+      body.ios-fullscreen .popup-heading{ font-size:calc(9.5px * 1.15 + 1px) !important }
+      body.ios-fullscreen .specs{ font-size:calc(8.5px * 1.15 + 1px) !important }
+      body.ios-fullscreen .spec-value{ font-size:calc(9.5px * 1.15 + 1px) !important }
+      body.ios-fullscreen .popup-link{ font-size:calc(10px * 1.15 + 1px) !important }
     }
 
+    /* ===== REMOVE TAP/FOCUS HIGHLIGHTS GLOBALLY ===== */
+    .popup-link,
+    .popup-link:focus,
+    .popup-link:active,
+    .popup-link:focus-visible {
+      background: transparent !important;
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .popup-link, .popup-link * {
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none !important;
+    }
   </style>
 </head>
 
@@ -222,14 +206,15 @@ const map=new mapboxgl.Map({
   container:"map",
   style:"mapbox://styles/mapbox/satellite-streets-v12",
   center:[-1.78,53.41],
-  zoom:11,
+  zoom:11, /* initial only; fitBounds will set the final */
   attributionControl:false
 });
 
-const nav = new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
+const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
+/* ===== iOS FULLSCREEN (same as Eryri) ===== */
 function isIOS(){
   const ua = navigator.userAgent || "";
   const platform = navigator.platform || "";
@@ -240,7 +225,6 @@ const params=new URLSearchParams(location.search);
 
 if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
-
   const hide=()=>{
     const el=document.querySelector('.mapboxgl-ctrl-fullscreen');
     if(el) el.style.display='none';
@@ -257,7 +241,6 @@ function addIOSFullscreenButton(){
 
   const navGroup=[...corner.querySelectorAll('.mapboxgl-ctrl-group')]
     .find(g=>g.querySelector('.mapboxgl-ctrl-zoom-in'));
-
   if(!navGroup) return;
 
   const btn=document.createElement('button');
@@ -286,9 +269,9 @@ function addIOSFullscreenButton(){
     window.open(url.toString(),"_blank");
   };
 }
-
 map.on('load', addIOSFullscreenButton);
 
+/* ===== ICONS ===== */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -297,6 +280,7 @@ const icons={
   directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
 };
 
+/* ===== POPUP HTML ===== */
 function specsHTML(s,u){
   return `
     <div class="specs">
@@ -306,12 +290,11 @@ function specsHTML(s,u){
         <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
       </div>
       <div class="links-group">
-        <div class="spec-row">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a></div>
+        <div class="spec-row hike-gap">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a></div>
         <div class="spec-row">${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank">Directions</a></div>
       </div>
     </div>`;
 }
-
 function popupHtmlFor(h){
   return `
     <div class="popup-card">
@@ -323,6 +306,7 @@ function popupHtmlFor(h){
     </div>`;
 }
 
+/* ===== GPX LOADER ===== */
 async function loadGpx(url){
   const res=await fetch(url);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
@@ -330,6 +314,35 @@ async function loadGpx(url){
   return gj.features.find(f=>f.geometry?.type==="LineString");
 }
 
+/* ===== HOVER SYSTEM (markers + routes) ===== */
+const routeLayerId={};
+const markerElsById={};
+let hoveredId=null;
+
+function setMarkerColor(id,color){
+  const el=markerElsById[id];
+  if(!el) return;
+  const p=el.querySelector("svg path");
+  if(p) p.setAttribute("fill",color);
+}
+function setRouteColor(id,color){
+  const lyr=routeLayerId[id];
+  if(lyr && map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",color);
+}
+function applyHoverState(){
+  Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
+  Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
+  if(hoveredId){
+    setRouteColor(hoveredId,BLUE);
+    setMarkerColor(hoveredId,BLUE);
+    map.getCanvas().style.cursor="pointer";
+  } else {
+    map.getCanvas().style.cursor="";
+  }
+}
+function setHovered(id){ hoveredId=id; applyHoverState(); }
+
+/* ===== ROUTE LAYER CREATION ===== */
 function addRoute(id,line){
   const src=`route-src-${id}`;
   const lyr=`route-lyr-${id}`;
@@ -340,18 +353,24 @@ function addRoute(id,line){
       id:lyr,
       type:"line",
       source:src,
-      paint:{ "line-color":RED,"line-width":3,"line-opacity":0.95 }
+      paint:{
+        "line-color":RED,
+        "line-width":3,
+        "line-opacity":0.95,
+        "line-color-transition":{ duration:0 }  // instant hover switch
+      }
     });
+  routeLayerId[id]=lyr;
 }
 
+/* ===== MAP LOAD ===== */
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
+  // Markers + popups
   hikes.forEach(h=>{
-    const popup=new mapboxgl.Popup({
-      offset:22,
-      closeButton:false
-    }).setHTML(popupHtmlFor(h));
+    const popup=new mapboxgl.Popup({ offset:22, closeButton:false })
+      .setHTML(popupHtmlFor(h));
 
     popup.on('open',()=>{
       if(window.innerWidth<600){
@@ -360,29 +379,40 @@ map.on("load", async () => {
       }
     });
 
-    new mapboxgl.Marker({color:RED})
+    const marker=new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
       .setPopup(popup)
       .addTo(map);
 
+    const el=marker.getElement();
+    el.classList.add("marker");
+    markerElsById[h.id]=el;
+
+    el.addEventListener("mouseenter",()=>setHovered(h.id));
+    el.addEventListener("mouseleave",()=>setHovered(null));
+
     bounds.extend(h.coords);
   });
 
-  await Promise.all(hikes.map(async h=>{
+  // Routes + hover on routes
+  for(const h of hikes){
     try{
       const line=await loadGpx(h.gpx);
       if(line){
         addRoute(h.id,line);
         line.geometry.coordinates.forEach(c=>bounds.extend(c));
+
+        map.on("mouseenter",routeLayerId[h.id],()=>setHovered(h.id));
+        map.on("mouseleave",routeLayerId[h.id],()=>setHovered(null));
       }
-    }catch{}
-  }));
+    }catch(e){}
+  }
 
   const isMobile=window.innerWidth<600;
 
   map.fitBounds(bounds,{
     padding:isMobile?30:110,
-    maxZoom:isMobile?14:11
+    maxZoom:isMobile?14:10   // desktop zooms out a bit more (matches Eryri)
   });
 
   if(isMobile){
