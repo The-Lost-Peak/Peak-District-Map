@@ -77,7 +77,6 @@
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none }
     .hike-gap{ margin-top:2px }
 
-    /* ===== MOBILE POPUP (same as Eryri/Peak mobile) ===== */
     @media (max-width:440px){
       .popup-card{ height:115px !important }
       .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
@@ -96,7 +95,6 @@
       .icon-img{ width:9px !important; height:9px !important }
     }
 
-    /* ===== FULLSCREEN MOBILE POPUP ===== */
     @media (max-width:440px){
       body.ios-fullscreen .popup-card{ height:calc(115px * 1.15) !important }
       body.ios-fullscreen .img-wrap{
@@ -119,7 +117,6 @@
       body.ios-fullscreen .icon-img{ width:calc(9px * 1.15) !important; height:calc(9px * 1.15) !important }
     }
 
-    /* ===== SAFE +1PX FULLSCREEN TEXT ===== */
     @media (max-width:440px){
       body.ios-fullscreen .popup-heading{ font-size:calc(9.5px * 1.15 + 1px) !important }
       body.ios-fullscreen .specs{ font-size:calc(8.5px * 1.15 + 1px) !important }
@@ -127,7 +124,6 @@
       body.ios-fullscreen .popup-link{ font-size:calc(10px * 1.15 + 1px) !important }
     }
 
-    /* ===== REMOVE TAP/FOCUS HIGHLIGHTS GLOBALLY ===== */
     .popup-link,
     .popup-link:focus,
     .popup-link:active,
@@ -143,20 +139,11 @@
       -webkit-user-select: none !important;
     }
 
-    /* ===== MOBILE ATTRIBUTION: keep Mapbox default "i", just move it above the Mapbox logo ===== */
+    /* ===== FORCE MAPBOX LOGO BACK TO TRUE BOTTOM LEFT ON MOBILE ===== */
     @media (max-width:600px){
       .mapboxgl-ctrl-bottom-left{
         left:10px !important;
-        bottom:62px !important;
-        z-index:5 !important;
-      }
-
-      /* do NOT style the button itself (that was hiding the "i") */
-      .mapboxgl-ctrl-attrib.mapboxgl-compact{
-        background:transparent !important;
-        box-shadow:none !important;
-        margin:0 !important;
-        padding:0 !important;
+        bottom:10px !important;
       }
     }
   </style>
@@ -217,72 +204,15 @@ const map=new mapboxgl.Map({
   style:"mapbox://styles/mapbox/satellite-streets-v12",
   center:[-1.78,53.41],
   zoom:11,
-  attributionControl:false
+  attributionControl:true
 });
 
 const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-/* Attribution: compact icon "i" (bottom left) */
-map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
-
-/* ===== iOS FULLSCREEN ===== */
-function isIOS(){
-  const ua = navigator.userAgent || "";
-  const platform = navigator.platform || "";
-  return /iPad|iPhone|iPod/.test(ua) || (platform==="MacIntel" && navigator.maxTouchPoints>1);
-}
-
-const params=new URLSearchParams(location.search);
-
-if(isIOS() && params.get("fs")==="1"){
-  document.body.classList.add("ios-fullscreen");
-  const hide=()=>{
-    const el=document.querySelector('.mapboxgl-ctrl-fullscreen');
-    if(el) el.style.display='none';
-  };
-  hide(); setTimeout(hide,500);
-}
-
-function addIOSFullscreenButton(){
-  if(!isIOS()) return;
-  if(params.get("fs")==="1") return;
-
-  const corner=document.querySelector('.mapboxgl-ctrl-bottom-right');
-  if(!corner) return;
-
-  const navGroup=[...corner.querySelectorAll('.mapboxgl-ctrl-group')]
-    .find(g=>g.querySelector('.mapboxgl-ctrl-zoom-in'));
-  if(!navGroup) return;
-
-  const btn=document.createElement('button');
-  btn.className='mapboxgl-ctrl-icon ios-fs-btn';
-  btn.id='iosFullscreenBtn';
-  btn.innerHTML=`
-    <svg viewBox="0 0 24 24">
-      <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2"/>
-      <polyline points="20,9 20,4 15,4" fill="none" stroke="#000" stroke-width="2"/>
-      <polyline points="4,15 4,20 9,20" fill="none" stroke="#000" stroke-width="2"/>
-      <polyline points="20,15 20,20 15,20" fill="none" stroke="#000" stroke-width="2"/>
-    </svg>`;
-
-  const zoomOut=navGroup.querySelector('.mapboxgl-ctrl-zoom-out');
-  const compass=navGroup.querySelector('.mapboxgl-ctrl-compass');
-
-  if(zoomOut){
-    navGroup.insertBefore(btn, compass || zoomOut.nextSibling);
-  } else {
-    navGroup.appendChild(btn);
-  }
-
-  btn.onclick=()=>{
-    const url=new URL(location.href);
-    url.searchParams.set("fs","1");
-    window.open(url.toString(),"_blank");
-  };
-}
-map.on('load', addIOSFullscreenButton);
+/* Compact attribution icon bottom-left */
+map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-left");
 
 /* ===== ICONS ===== */
 const icons={
@@ -293,7 +223,6 @@ const icons={
   directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
 };
 
-/* ===== POPUP HTML ===== */
 function specsHTML(s,u){
   return `
     <div class="specs">
@@ -319,7 +248,6 @@ function popupHtmlFor(h){
     </div>`;
 }
 
-/* ===== GPX LOADER ===== */
 async function loadGpx(url){
   const res=await fetch(url);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
@@ -327,7 +255,6 @@ async function loadGpx(url){
   return gj.features.find(f=>f.geometry?.type==="LineString");
 }
 
-/* ===== HOVER SYSTEM (markers + routes) ===== */
 const routeLayerId={};
 const markerElsById={};
 let hoveredId=null;
@@ -355,7 +282,6 @@ function applyHoverState(){
 }
 function setHovered(id){ hoveredId=id; applyHoverState(); }
 
-/* ===== ROUTE LAYER CREATION ===== */
 function addRoute(id,line){
   const src=`route-src-${id}`;
   const lyr=`route-lyr-${id}`;
@@ -376,20 +302,12 @@ function addRoute(id,line){
   routeLayerId[id]=lyr;
 }
 
-/* ===== MAP LOAD ===== */
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
   hikes.forEach(h=>{
     const popup=new mapboxgl.Popup({ offset:22, closeButton:false })
       .setHTML(popupHtmlFor(h));
-
-    popup.on('open',()=>{
-      if(window.innerWidth<600){
-        const ll=popup.getLngLat();
-        map.easeTo({ center:ll, offset:[0,-80], duration:400 });
-      }
-    });
 
     const marker=new mapboxgl.Marker({color:RED})
       .setLngLat(h.coords)
