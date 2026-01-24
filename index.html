@@ -143,15 +143,14 @@
       -webkit-user-select: none !important;
     }
 
-    /* ===== MOBILE ATTRIBUTION ===== */
+    /* ===== MOBILE ATTRIBUTION (single line look, scrollable if needed) ===== */
     @media (max-width:600px){
       .mapboxgl-ctrl-bottom-right{
         right:10px !important;
         bottom:10px !important;
       }
 
-      /* NON COMPACT (full text bar) styling only */
-      .mapboxgl-ctrl-attrib:not(.mapboxgl-compact){
+      .mapboxgl-ctrl-attrib{
         background:rgba(0,0,0,.35) !important;
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
@@ -162,8 +161,8 @@
         max-width:calc(100vw - 20px) !important;
       }
 
-      .mapboxgl-ctrl-attrib:not(.mapboxgl-compact),
-      .mapboxgl-ctrl-attrib:not(.mapboxgl-compact) *{
+      .mapboxgl-ctrl-attrib,
+      .mapboxgl-ctrl-attrib *{
         font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
         font-size:10px !important;
         line-height:1.1 !important;
@@ -171,39 +170,42 @@
         text-shadow:none !important;
       }
 
-      .mapboxgl-ctrl-attrib:not(.mapboxgl-compact) a{
+      .mapboxgl-ctrl-attrib a{
         color:rgba(255,255,255,.95) !important;
         text-decoration:none !important;
         font-weight:600 !important;
       }
 
-      .mapboxgl-ctrl-attrib:not(.mapboxgl-compact) .mapboxgl-ctrl-attrib-inner{
+      .mapboxgl-ctrl-attrib .mapboxgl-ctrl-attrib-inner{
         white-space:nowrap !important;
         overflow-x:auto !important;
         overflow-y:hidden !important;
         -webkit-overflow-scrolling:touch;
         scrollbar-width:none;
       }
-      .mapboxgl-ctrl-attrib:not(.mapboxgl-compact) .mapboxgl-ctrl-attrib-inner::-webkit-scrollbar{
+      .mapboxgl-ctrl-attrib .mapboxgl-ctrl-attrib-inner::-webkit-scrollbar{
         display:none;
       }
 
-      /* COMPACT (i icon) fix: remove the pill / oblong background */
+      /* FIX FOR COMPACT MODE: remove black oblong, keep the i visible */
       .mapboxgl-ctrl-attrib.mapboxgl-compact{
         background:transparent !important;
-        padding:0 !important;
-        margin:0 !important;
         box-shadow:none !important;
-        backdrop-filter:none !important;
-        -webkit-backdrop-filter:none !important;
-        border-radius:9999px !important;
+        padding:0 !important;
       }
-      .mapboxgl-ctrl-attrib.mapboxgl-compact .mapboxgl-ctrl-attrib-button{
+      .mapboxgl-ctrl-attrib.mapboxgl-compact .mapboxgl-ctrl-attrib-inner{
         background:transparent !important;
-        padding:0 !important;
-        margin:0 !important;
         box-shadow:none !important;
-        border-radius:9999px !important;
+        padding:0 !important;
+      }
+      .mapboxgl-ctrl-attrib-button{
+        background:rgba(0,0,0,.35) !important;
+        border-radius:8px !important;
+        width:22px !important;
+        height:22px !important;
+      }
+      .mapboxgl-ctrl-attrib-button:before{
+        color:rgba(255,255,255,.95) !important;
       }
     }
   </style>
@@ -272,7 +274,7 @@ map.addControl(nav, "bottom-right");
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
 /* Attribution: compact icon, bottom right */
-map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
+map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-right");
 
 /* ===== iOS FULLSCREEN ===== */
 function isIOS(){
