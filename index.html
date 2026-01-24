@@ -11,13 +11,7 @@
     html, body { margin:0; height:100% }
     #map { position:absolute; inset:0 }
 
-    .mapboxgl-ctrl-logo,
-    .mapboxgl-ctrl-attrib,
-    .mapboxgl-ctrl-attrib-inner {
-      display:none !important;
-      visibility:hidden !important;
-    }
-
+    /* Attribution now allowed to show */
     .marker{ cursor:pointer !important }
     .marker svg{ transform:scale(0.85); transform-origin:center }
 
@@ -206,9 +200,12 @@ const map=new mapboxgl.Map({
   container:"map",
   style:"mapbox://styles/mapbox/satellite-streets-v12",
   center:[-1.78,53.41],
-  zoom:11, /* initial only; fitBounds will set the final */
+  zoom:11,
   attributionControl:false
 });
+
+/* Single non-compact attribution */
+map.addControl(new mapboxgl.AttributionControl({ compact:false }), "bottom-right");
 
 const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
@@ -357,7 +354,7 @@ function addRoute(id,line){
         "line-color":RED,
         "line-width":3,
         "line-opacity":0.95,
-        "line-color-transition":{ duration:0 }  // instant hover switch
+        "line-color-transition":{ duration:0 }
       }
     });
   routeLayerId[id]=lyr;
@@ -367,7 +364,6 @@ function addRoute(id,line){
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
-  // Markers + popups
   hikes.forEach(h=>{
     const popup=new mapboxgl.Popup({ offset:22, closeButton:false })
       .setHTML(popupHtmlFor(h));
@@ -394,7 +390,6 @@ map.on("load", async () => {
     bounds.extend(h.coords);
   });
 
-  // Routes + hover on routes
   for(const h of hikes){
     try{
       const line=await loadGpx(h.gpx);
@@ -412,7 +407,7 @@ map.on("load", async () => {
 
   map.fitBounds(bounds,{
     padding:isMobile?30:110,
-    maxZoom:isMobile?14:10.5   // desktop zooms out a bit more (matches Eryri)
+    maxZoom:isMobile?14:10.5
   });
 
   if(isMobile){
