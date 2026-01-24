@@ -143,10 +143,10 @@
       -webkit-user-select: none !important;
     }
 
-    /* ===== MOBILE ATTRIBUTION (B: single line look, scrollable if needed) ===== */
+    /* ===== MOBILE ATTRIBUTION (single line look, scrollable if needed) ===== */
     @media (max-width:600px){
-      .mapboxgl-ctrl-bottom-left{
-        left:10px !important;
+      .mapboxgl-ctrl-bottom-right{
+        right:10px !important;
         bottom:10px !important;
       }
 
@@ -252,8 +252,8 @@ const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-/* Attribution (kept visible, styled via CSS on mobile) */
-map.addControl(new mapboxgl.AttributionControl({ compact:false }), "bottom-left");
+/* Attribution: compact icon, bottom right */
+map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
 
 /* ===== iOS FULLSCREEN ===== */
 function isIOS(){
