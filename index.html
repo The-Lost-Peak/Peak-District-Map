@@ -30,7 +30,7 @@
       text-transform:capitalize;
     }
 
-    /* ===== DESKTOP POPUP (match Eryri) ===== */
+    /* ===== DESKTOP POPUP ===== */
     .popup-card{
       display:flex;
       align-items:stretch;
@@ -77,7 +77,7 @@
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none }
     .hike-gap{ margin-top:2px }
 
-    /* ===== MOBILE POPUP (same as Eryri/Peak mobile) ===== */
+    /* ===== MOBILE POPUP ===== */
     @media (max-width:440px){
       .popup-card{ height:115px !important }
       .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
@@ -158,14 +158,24 @@
       order:3;
     }
 
-    /* ===== FORCE THE COMPACT ATTRIBUTION (i) TO BE VISIBLE AND SIZED CORRECTLY ===== */
-    .mapboxgl-ctrl-attrib{ display:block !important }
-    .mapboxgl-ctrl-attrib.mapboxgl-compact{ margin:0 !important; padding:0 !important }
-    .mapboxgl-ctrl-attrib.mapboxgl-compact button{
+    /* ===== FIX: REMOVE GREY BOX FROM ATTRIBUTION (i) ===== */
+    .mapboxgl-ctrl-attrib { 
+      display:block !important; 
+      background: transparent !important; /* Removes background from container */
+    }
+    .mapboxgl-ctrl-attrib.mapboxgl-compact { 
+      margin:0 !important; 
+      padding:0 !important; 
+    }
+    .mapboxgl-ctrl-attrib.mapboxgl-compact button {
       width:29px !important;
       height:29px !important;
       margin:0 !important;
       padding:0 !important;
+      background-color: transparent !important; /* Removes grey circle/box */
+      background-image: none !important;
+      border: none !important;
+      box-shadow: none !important;
     }
   </style>
 </head>
@@ -231,13 +241,9 @@ const map=new mapboxgl.Map({
 const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 
-/* Keep fullscreen button */
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-
-/* One attribution control only, bottom right, compact icon */
 map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-right");
 
-/* ===== iOS FULLSCREEN ===== */
 function isIOS(){
   const ua = navigator.userAgent || "";
   const platform = navigator.platform || "";
@@ -293,7 +299,6 @@ function addIOSFullscreenButton(){
 }
 map.on("load", addIOSFullscreenButton);
 
-/* ===== ICONS ===== */
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
   length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
@@ -302,7 +307,6 @@ const icons={
   directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
 };
 
-/* ===== POPUP HTML ===== */
 function specsHTML(s,u){
   return `
     <div class="specs">
@@ -328,7 +332,6 @@ function popupHtmlFor(h){
     </div>`;
 }
 
-/* ===== GPX LOADER ===== */
 async function loadGpx(url){
   const res=await fetch(url);
   const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
@@ -336,7 +339,6 @@ async function loadGpx(url){
   return gj.features.find(f=>f.geometry?.type==="LineString");
 }
 
-/* ===== HOVER SYSTEM (markers + routes) ===== */
 const routeLayerId={};
 const markerElsById={};
 let hoveredId=null;
@@ -364,7 +366,6 @@ function applyHoverState(){
 }
 function setHovered(id){ hoveredId=id; applyHoverState(); }
 
-/* ===== ROUTE LAYER CREATION ===== */
 function addRoute(id,line){
   const src=`route-src-${id}`;
   const lyr=`route-lyr-${id}`;
@@ -383,7 +384,6 @@ function addRoute(id,line){
   routeLayerId[id]=lyr;
 }
 
-/* ===== MAP LOAD ===== */
 map.on("load", async () => {
   const bounds=new mapboxgl.LngLatBounds();
 
@@ -427,7 +427,6 @@ map.on("load", async () => {
   }
 
   const isMobile=window.innerWidth<600;
-
   map.fitBounds(bounds,{
     padding:isMobile?30:110,
     maxZoom:isMobile?14:10.5
