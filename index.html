@@ -30,7 +30,7 @@
       text-transform:capitalize;
     }
 
-    /* ===== DESKTOP POPUP (match Eryri) ===== */
+    /* ===== DESKTOP POPUP ===== */
     .popup-card{
       display:flex;
       align-items:stretch;
@@ -70,13 +70,14 @@
     .icon-blue{ color:#3899EC }
     .icon-img{
       width:12px; height:12px; display:block;
-      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%)
+      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
     }
 
     .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none }
     .hike-gap{ margin-top:2px }
 
+    /* ===== MOBILE POPUP ===== */
     @media (max-width:440px){
       .popup-card{ height:115px !important }
       .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
@@ -86,7 +87,6 @@
         max-width:105px !important;
         padding:4px 6px !important;
       }
-
       .popup-heading{ font-size:9.5px !important }
       .specs{ font-size:8.5px !important }
       .spec-value{ font-size:9.5px !important }
@@ -95,6 +95,7 @@
       .icon-img{ width:9px !important; height:9px !important }
     }
 
+    /* ===== FULLSCREEN MOBILE POPUP ===== */
     @media (max-width:440px){
       body.ios-fullscreen .popup-card{ height:calc(115px * 1.15) !important }
       body.ios-fullscreen .img-wrap{
@@ -117,6 +118,7 @@
       body.ios-fullscreen .icon-img{ width:calc(9px * 1.15) !important; height:calc(9px * 1.15) !important }
     }
 
+    /* ===== SAFE +1PX FULLSCREEN TEXT ===== */
     @media (max-width:440px){
       body.ios-fullscreen .popup-heading{ font-size:calc(9.5px * 1.15 + 1px) !important }
       body.ios-fullscreen .specs{ font-size:calc(8.5px * 1.15 + 1px) !important }
@@ -124,232 +126,331 @@
       body.ios-fullscreen .popup-link{ font-size:calc(10px * 1.15 + 1px) !important }
     }
 
+    /* ===== REMOVE TAP FOCUS HIGHLIGHTS ===== */
     .popup-link,
     .popup-link:focus,
     .popup-link:active,
-    .popup-link:focus-visible {
-      background: transparent !important;
-      outline: none !important;
-      border: none !important;
-      box-shadow: none !important;
+    .popup-link:focus-visible{
+      background:transparent !important;
+      outline:none !important;
+      border:none !important;
+      box-shadow:none !important;
     }
-    .popup-link, .popup-link * {
-      -webkit-tap-highlight-color: transparent !important;
-      -webkit-touch-callout: none !important;
-      -webkit-user-select: none !important;
+    .popup-link, .popup-link *{
+      -webkit-tap-highlight-color:transparent !important;
+      -webkit-touch-callout:none !important;
+      -webkit-user-select:none !important;
     }
 
-    /* ===== FORCE MAPBOX LOGO BACK TO TRUE BOTTOM LEFT ON MOBILE ===== */
+    /* ===== CONTROL STACK ABOVE ATTRIBUTION ICON (BOTTOM RIGHT) ===== */
+    .mapboxgl-ctrl-bottom-right{
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:flex-end !important;
+      gap:6px !important;
+    }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-group,
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen{
+      order:1;
+    }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib{
+      order:3;
+    }
+
+    /* ===== MOBILE ATTRIBUTION ICON ONLY, NO BLACK OBLONG ===== */
     @media (max-width:600px){
-      .mapboxgl-ctrl-bottom-left{
-        left:10px !important;
+      .mapboxgl-ctrl-bottom-right{
+        right:10px !important;
         bottom:10px !important;
+      }
+
+      /* if compact true is used, Mapbox shows the small icon button */
+      .mapboxgl-ctrl-attrib{
+        background:transparent !important;
+        box-shadow:none !important;
+        margin:0 !important;
+        padding:0 !important;
+        border-radius:0 !important;
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
+      }
+
+      /* remove any default button background that creates the black oblong */
+      .mapboxgl-ctrl-attrib button{
+        background:transparent !important;
+        box-shadow:none !important;
       }
     }
   </style>
 </head>
 
 <body>
-<div id="map"></div>
+  <div id="map"></div>
 
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
-<script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+  <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
 
-<script>
-mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
+  <script>
+    mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
-const RED="#EC2629", BLUE="#3899EC";
+    const RED="#EC2629", BLUE="#3899EC";
 
-const IMG={
-  derwent:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/derwent-dam-tower.jpg",
-  crashed:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/b29-overexposed-crash-site.jpg",
-  kinder:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/kinder-scout-carved-rock.png"
-};
+    const IMG={
+      derwent:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/derwent-dam-tower.jpg",
+      crashed:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/b29-overexposed-crash-site.jpg",
+      kinder:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/images/kinder-scout-carved-rock.png"
+    };
 
-const hikes=[
-  {
-    id:"derwent-edge",
-    name:"Derwent Edge",
-    coords:[-1.7427849606990842,53.400582126300236],
-    hikeUrl:"https://www.thelostpeak.co.uk/peak-district-hikes/derwent-edge-hike",
-    directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
-    gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
-    photo:IMG.derwent,
-    specs:{ duration:"3 to 4 hours", length:"7.4 miles", ascent:"367m" }
-  },
-  {
-    id:"crashed-plane",
-    name:"Crashed Plane Hike",
-    coords:[-1.8689,53.4329],
-    hikeUrl:"https://www.thelostpeak.co.uk/peak-district-hikes/the-crashed-plane-hike",
-    directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
-    gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
-    photo:IMG.crashed,
-    specs:{ duration:"2 to 3 hours", length:"3.6 miles", ascent:"145m" }
-  },
-  {
-    id:"kinder-scout",
-    name:"Kinder Scout",
-    coords:[-1.8151209383535991,53.364872107766416],
-    hikeUrl:"https://www.thelostpeak.co.uk/peak-district-hikes/kinder-scout-hike",
-    directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
-    gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx",
-    photo:IMG.kinder,
-    specs:{ duration:"4 to 6 hours", length:"8.3 miles", ascent:"562m" }
-  }
-];
+    const hikes=[
+      {
+        id:"derwent-edge",
+        name:"Derwent Edge",
+        coords:[-1.7427849606990842,53.400582126300236],
+        hikeUrl:"https://www.thelostpeak.co.uk/peak-district-hikes/derwent-edge-hike",
+        directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.400582126300236,-1.7427849606990842",
+        gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Derwent%20Edge.gpx",
+        photo:IMG.derwent,
+        specs:{ duration:"3 to 4 hours", length:"7.4 miles", ascent:"367m" }
+      },
+      {
+        id:"crashed-plane",
+        name:"Crashed Plane Hike",
+        coords:[-1.8689,53.4329],
+        hikeUrl:"https://www.thelostpeak.co.uk/peak-district-hikes/the-crashed-plane-hike",
+        directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.4329,-1.8689",
+        gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/The%20Crashed%20Plane%20Hike.gpx",
+        photo:IMG.crashed,
+        specs:{ duration:"2 to 3 hours", length:"3.6 miles", ascent:"145m" }
+      },
+      {
+        id:"kinder-scout",
+        name:"Kinder Scout",
+        coords:[-1.8151209383535991,53.364872107766416],
+        hikeUrl:"https://www.thelostpeak.co.uk/peak-district-hikes/kinder-scout-hike",
+        directionsUrl:"https://www.google.com/maps/dir/?api=1&destination=53.364872107766416,-1.8151209383535991",
+        gpx:"https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/refs/heads/main/gpx/Kinder%20Scout%20Hike.gpx",
+        photo:IMG.kinder,
+        specs:{ duration:"4 to 6 hours", length:"8.3 miles", ascent:"562m" }
+      }
+    ];
 
-const map=new mapboxgl.Map({
-  container:"map",
-  style:"mapbox://styles/mapbox/satellite-streets-v12",
-  center:[-1.78,53.41],
-  zoom:11,
-  attributionControl:true
-});
+    const map=new mapboxgl.Map({
+      container:"map",
+      style:"mapbox://styles/mapbox/satellite-streets-v12",
+      center:[-1.78,53.41],
+      zoom:11,
+      attributionControl:false
+    });
 
-const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
-map.addControl(nav, "bottom-right");
-map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+    const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
+    map.addControl(nav, "bottom-right");
 
-/* Compact attribution icon bottom-left */
-map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-left");
+    map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-/* ===== ICONS ===== */
-const icons={
-  clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
-  length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
-  ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
-  walk:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/walking-person-go-walk-move-svgrepo-com.svg">`,
-  directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
-};
+    /* Only one attribution control, bottom right, compact icon */
+    map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-right");
 
-function specsHTML(s,u){
-  return `
-    <div class="specs">
-      <div class="stats-group">
-        <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
-        <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
-        <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
-      </div>
-      <div class="links-group">
-        <div class="spec-row hike-gap">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a></div>
-        <div class="spec-row">${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank">Directions</a></div>
-      </div>
-    </div>`;
-}
-function popupHtmlFor(h){
-  return `
-    <div class="popup-card">
-      <div class="img-wrap"><img src="${h.photo}" alt="${h.name}"></div>
-      <div class="popup-body">
-        <div class="popup-heading">${h.name}</div>
-        ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
-      </div>
-    </div>`;
-}
+    function isIOS(){
+      const ua=navigator.userAgent || "";
+      const platform=navigator.platform || "";
+      return /iPad|iPhone|iPod/.test(ua) || (platform==="MacIntel" && navigator.maxTouchPoints>1);
+    }
 
-async function loadGpx(url){
-  const res=await fetch(url);
-  const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
-  const gj=toGeoJSON.gpx(xml);
-  return gj.features.find(f=>f.geometry?.type==="LineString");
-}
+    const params=new URLSearchParams(location.search);
 
-const routeLayerId={};
-const markerElsById={};
-let hoveredId=null;
+    if(isIOS() && params.get("fs")==="1"){
+      document.body.classList.add("ios-fullscreen");
+      const hide=()=>{
+        const el=document.querySelector(".mapboxgl-ctrl-fullscreen");
+        if(el) el.style.display="none";
+      };
+      hide(); setTimeout(hide,500);
+    }
 
-function setMarkerColor(id,color){
-  const el=markerElsById[id];
-  if(!el) return;
-  const p=el.querySelector("svg path");
-  if(p) p.setAttribute("fill",color);
-}
-function setRouteColor(id,color){
-  const lyr=routeLayerId[id];
-  if(lyr && map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",color);
-}
-function applyHoverState(){
-  Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
-  Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
-  if(hoveredId){
-    setRouteColor(hoveredId,BLUE);
-    setMarkerColor(hoveredId,BLUE);
-    map.getCanvas().style.cursor="pointer";
-  } else {
-    map.getCanvas().style.cursor="";
-  }
-}
-function setHovered(id){ hoveredId=id; applyHoverState(); }
+    function addIOSFullscreenButton(){
+      if(!isIOS()) return;
+      if(params.get("fs")==="1") return;
 
-function addRoute(id,line){
-  const src=`route-src-${id}`;
-  const lyr=`route-lyr-${id}`;
-  if(!map.getSource(src))
-    map.addSource(src,{type:"geojson",data:line});
-  if(!map.getLayer(lyr))
-    map.addLayer({
-      id:lyr,
-      type:"line",
-      source:src,
-      paint:{
-        "line-color":RED,
-        "line-width":3,
-        "line-opacity":0.95,
-        "line-color-transition":{ duration:0 }
+      const corner=document.querySelector(".mapboxgl-ctrl-bottom-right");
+      if(!corner) return;
+
+      const navGroup=[...corner.querySelectorAll(".mapboxgl-ctrl-group")]
+        .find(g=>g.querySelector(".mapboxgl-ctrl-zoom-in"));
+      if(!navGroup) return;
+
+      const btn=document.createElement("button");
+      btn.className="mapboxgl-ctrl-icon ios-fs-btn";
+      btn.id="iosFullscreenBtn";
+      btn.innerHTML=`
+        <svg viewBox="0 0 24 24">
+          <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2"/>
+          <polyline points="20,9 20,4 15,4" fill="none" stroke="#000" stroke-width="2"/>
+          <polyline points="4,15 4,20 9,20" fill="none" stroke="#000" stroke-width="2"/>
+          <polyline points="20,15 20,20 15,20" fill="none" stroke="#000" stroke-width="2"/>
+        </svg>`;
+
+      const zoomOut=navGroup.querySelector(".mapboxgl-ctrl-zoom-out");
+      const compass=navGroup.querySelector(".mapboxgl-ctrl-compass");
+
+      if(zoomOut){
+        navGroup.insertBefore(btn, compass || zoomOut.nextSibling);
+      }else{
+        navGroup.appendChild(btn);
+      }
+
+      btn.onclick=()=>{
+        const url=new URL(location.href);
+        url.searchParams.set("fs","1");
+        window.open(url.toString(),"_blank");
+      };
+    }
+    map.on("load", addIOSFullscreenButton);
+
+    const icons={
+      clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
+      length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
+      ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
+      walk:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/walking-person-go-walk-move-svgrepo-com.svg">`,
+      directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
+    };
+
+    function specsHTML(s,u){
+      return `
+        <div class="specs">
+          <div class="stats-group">
+            <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
+            <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
+            <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
+          </div>
+          <div class="links-group">
+            <div class="spec-row hike-gap">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a></div>
+            <div class="spec-row">${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank">Directions</a></div>
+          </div>
+        </div>`;
+    }
+
+    function popupHtmlFor(h){
+      return `
+        <div class="popup-card">
+          <div class="img-wrap"><img src="${h.photo}" alt="${h.name}"></div>
+          <div class="popup-body">
+            <div class="popup-heading">${h.name}</div>
+            ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
+          </div>
+        </div>`;
+    }
+
+    async function loadGpx(url){
+      const res=await fetch(url);
+      const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
+      const gj=toGeoJSON.gpx(xml);
+      return gj.features.find(f=>f.geometry?.type==="LineString");
+    }
+
+    const routeLayerId={};
+    const markerElsById={};
+    let hoveredId=null;
+
+    function setMarkerColor(id,color){
+      const el=markerElsById[id];
+      if(!el) return;
+      const p=el.querySelector("svg path");
+      if(p) p.setAttribute("fill",color);
+    }
+    function setRouteColor(id,color){
+      const lyr=routeLayerId[id];
+      if(lyr && map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",color);
+    }
+    function applyHoverState(){
+      Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
+      Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
+      if(hoveredId){
+        setRouteColor(hoveredId,BLUE);
+        setMarkerColor(hoveredId,BLUE);
+        map.getCanvas().style.cursor="pointer";
+      }else{
+        map.getCanvas().style.cursor="";
+      }
+    }
+    function setHovered(id){ hoveredId=id; applyHoverState(); }
+
+    function addRoute(id,line){
+      const src=`route-src-${id}`;
+      const lyr=`route-lyr-${id}`;
+
+      if(!map.getSource(src)) map.addSource(src,{type:"geojson",data:line});
+
+      if(!map.getLayer(lyr)){
+        map.addLayer({
+          id:lyr,
+          type:"line",
+          source:src,
+          paint:{
+            "line-color":RED,
+            "line-width":3,
+            "line-opacity":0.95,
+            "line-color-transition":{ duration:0 }
+          }
+        });
+      }
+      routeLayerId[id]=lyr;
+    }
+
+    map.on("load", async () => {
+      const bounds=new mapboxgl.LngLatBounds();
+
+      hikes.forEach(h=>{
+        const popup=new mapboxgl.Popup({ offset:22, closeButton:false })
+          .setHTML(popupHtmlFor(h));
+
+        popup.on("open",()=>{
+          if(window.innerWidth<600){
+            const ll=popup.getLngLat();
+            map.easeTo({ center:ll, offset:[0,-80], duration:400 });
+          }
+        });
+
+        const marker=new mapboxgl.Marker({color:RED})
+          .setLngLat(h.coords)
+          .setPopup(popup)
+          .addTo(map);
+
+        const el=marker.getElement();
+        el.classList.add("marker");
+        markerElsById[h.id]=el;
+
+        el.addEventListener("mouseenter",()=>setHovered(h.id));
+        el.addEventListener("mouseleave",()=>setHovered(null));
+
+        bounds.extend(h.coords);
+      });
+
+      for(const h of hikes){
+        try{
+          const line=await loadGpx(h.gpx);
+          if(line){
+            addRoute(h.id,line);
+            line.geometry.coordinates.forEach(c=>bounds.extend(c));
+
+            map.on("mouseenter",routeLayerId[h.id],()=>setHovered(h.id));
+            map.on("mouseleave",routeLayerId[h.id],()=>setHovered(null));
+          }
+        }catch(e){}
+      }
+
+      const isMobile=window.innerWidth<600;
+
+      map.fitBounds(bounds,{
+        padding:isMobile?30:110,
+        maxZoom:isMobile?14:10.5
+      });
+
+      if(isMobile){
+        map.once("idle",()=>{
+          if(map.getZoom()>11.6) map.setZoom(11.6);
+        });
       }
     });
-  routeLayerId[id]=lyr;
-}
-
-map.on("load", async () => {
-  const bounds=new mapboxgl.LngLatBounds();
-
-  hikes.forEach(h=>{
-    const popup=new mapboxgl.Popup({ offset:22, closeButton:false })
-      .setHTML(popupHtmlFor(h));
-
-    const marker=new mapboxgl.Marker({color:RED})
-      .setLngLat(h.coords)
-      .setPopup(popup)
-      .addTo(map);
-
-    const el=marker.getElement();
-    el.classList.add("marker");
-    markerElsById[h.id]=el;
-
-    el.addEventListener("mouseenter",()=>setHovered(h.id));
-    el.addEventListener("mouseleave",()=>setHovered(null));
-
-    bounds.extend(h.coords);
-  });
-
-  for(const h of hikes){
-    try{
-      const line=await loadGpx(h.gpx);
-      if(line){
-        addRoute(h.id,line);
-        line.geometry.coordinates.forEach(c=>bounds.extend(c));
-
-        map.on("mouseenter",routeLayerId[h.id],()=>setHovered(h.id));
-        map.on("mouseleave",routeLayerId[h.id],()=>setHovered(null));
-      }
-    }catch(e){}
-  }
-
-  const isMobile=window.innerWidth<600;
-
-  map.fitBounds(bounds,{
-    padding:isMobile?30:110,
-    maxZoom:isMobile?14:10.5
-  });
-
-  if(isMobile){
-    map.once("idle",()=>{
-      if(map.getZoom()>11.6) map.setZoom(11.6);
-    });
-  }
-});
-</script>
+  </script>
 </body>
 </html>
