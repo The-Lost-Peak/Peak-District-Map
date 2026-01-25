@@ -135,7 +135,7 @@
       -webkit-user-select:none !important;
     }
 
-    /* ===== BOTTOM RIGHT CONTROLS ===== */
+    /* ===== BOTTOM RIGHT: controls stacked ABOVE the attribution (i) ===== */
     .mapboxgl-ctrl-bottom-right{
       display:flex !important;
       flex-direction:column !important;
@@ -150,29 +150,27 @@
       order:3;
     }
 
-    /* ===== FIXED ATTRIBUTION (i) - NO GREY BOX, FORCED VISIBILITY ===== */
+    /* ===== REMOVE GREY BOX FROM ATTRIBUTION (i) ===== */
     .mapboxgl-ctrl-attrib { 
-      display: block !important; 
+      display:block !important; 
       background: transparent !important; 
     }
-    
     .mapboxgl-ctrl-attrib.mapboxgl-compact { 
-      min-width: 30px !important;
-      min-height: 30px !important;
-      background: transparent !important;
+      margin:0 !important; 
+      padding:0 !important; 
+      background-color: transparent !important;
     }
-
     .mapboxgl-ctrl-attrib.mapboxgl-compact button {
-      display: block !important;
-      visibility: visible !important;
-      width: 26px !important;
-      height: 26px !important;
-      background-color: transparent !important; /* The core request */
+      width:29px !important;
+      height:29px !important;
+      margin:0 !important;
+      padding:0 !important;
+      background-color: transparent !important; /* Removes only the background color */
       border: none !important;
       box-shadow: none !important;
-      cursor: pointer !important;
-      /* This filter makes the black "i" icon white so it shows on satellite */
-      filter: invert(1) drop-shadow(0px 0px 1px black) !important; 
+      /* Flips the black icon to white so it's visible on satellite map */
+      filter: invert(1) brightness(2) !important; 
+      display: block !important;
     }
   </style>
 </head>
@@ -239,6 +237,7 @@ const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
 map.addControl(nav, "bottom-right");
 
 map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+
 map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-right");
 
 function isIOS(){
@@ -424,6 +423,7 @@ map.on("load", async () => {
   }
 
   const isMobile=window.innerWidth<600;
+
   map.fitBounds(bounds,{
     padding:isMobile?30:110,
     maxZoom:isMobile?14:10.5
