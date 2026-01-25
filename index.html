@@ -119,6 +119,7 @@
       body.ios-fullscreen .icon-img{ width:calc(9px * 1.15) !important; height:calc(9px * 1.15) !important }
     }
 
+    /* ===== REMOVE TAP/FOCUS HIGHLIGHTS ===== */
     .popup-link,
     .popup-link:focus,
     .popup-link:active,
@@ -134,20 +135,21 @@
       -webkit-user-select:none !important;
     }
 
+    /* ===== BOTTOM RIGHT STACK ===== */
     .mapboxgl-ctrl-bottom-right {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: flex-end !important;
-      gap: 6px !important;
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:flex-end !important;
+      gap:6px !important;
     }
 
     .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-group,
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen { order: 1; }
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib { order: 2; }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen { order:1; }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib { order:2; }
 
-    /* ONLY CHANGE */
+    /* ===== ATTRIBUTION POSITION (ONLY CHANGE) ===== */
     .mapboxgl-ctrl-attrib{
-      transform: translate(-1px, 5px);
+      transform: translate(-1px, 3px);
     }
   </style>
 </head>
@@ -211,18 +213,19 @@ const map=new mapboxgl.Map({
 });
 
 const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
-map.addControl(nav, "bottom-right");
-map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-right");
+map.addControl(nav,"bottom-right");
+map.addControl(new mapboxgl.FullscreenControl(),"bottom-right");
+map.addControl(new mapboxgl.AttributionControl({ compact:true }),"bottom-right");
 
 function isIOS(){
-  const ua = navigator.userAgent || "";
-  const platform = navigator.platform || "";
-  return /iPad|iPhone|iPod/.test(ua) || (platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const ua=navigator.userAgent||"";
+  const platform=navigator.platform||"";
+  return /iPad|iPhone|iPod/.test(ua)||(platform==="MacIntel"&&navigator.maxTouchPoints>1);
 }
+
 const params=new URLSearchParams(location.search);
 
-if(isIOS() && params.get("fs")==="1"){
+if(isIOS()&&params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
   const hide=()=>{
     const el=document.querySelector(".mapboxgl-ctrl-fullscreen");
@@ -252,23 +255,21 @@ function addIOSFullscreenButton(){
       <polyline points="4,15 4,20 9,20" fill="none" stroke="#000" stroke-width="2"/>
       <polyline points="20,15 20,20 15,20" fill="none" stroke="#000" stroke-width="2"/>
     </svg>`;
-
   const zoomOut=navGroup.querySelector(".mapboxgl-ctrl-zoom-out");
   const compass=navGroup.querySelector(".mapboxgl-ctrl-compass");
-
   if(zoomOut){
-    navGroup.insertBefore(btn, compass || zoomOut.nextSibling);
-  } else {
+    navGroup.insertBefore(btn,compass||zoomOut.nextSibling);
+  }else{
     navGroup.appendChild(btn);
   }
-
   btn.onclick=()=>{
     const url=new URL(location.href);
     url.searchParams.set("fs","1");
     window.open(url.toString(),"_blank");
   };
 }
-map.on("load", addIOSFullscreenButton);
+
+map.on("load",addIOSFullscreenButton);
 
 const icons={
   clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
@@ -322,7 +323,7 @@ function setMarkerColor(id,color){
 }
 function setRouteColor(id,color){
   const lyr=routeLayerId[id];
-  if(lyr && map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",color);
+  if(lyr&&map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",color);
 }
 function applyHoverState(){
   Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
@@ -331,11 +332,11 @@ function applyHoverState(){
     setRouteColor(hoveredId,BLUE);
     setMarkerColor(hoveredId,BLUE);
     map.getCanvas().style.cursor="pointer";
-  } else {
+  }else{
     map.getCanvas().style.cursor="";
   }
 }
-function setHovered(id){ hoveredId=id; applyHoverState(); }
+function setHovered(id){hoveredId=id;applyHoverState();}
 
 function addRoute(id,line){
   const src=`route-src-${id}`;
@@ -349,27 +350,17 @@ function addRoute(id,line){
       "line-color":RED,
       "line-width":3,
       "line-opacity":0.95,
-      "line-color-transition":{ duration:0 }
+      "line-color-transition":{duration:0}
     }
   });
   routeLayerId[id]=lyr;
 }
 
-map.on("load", async () => {
+map.on("load",async()=>{
   const bounds=new mapboxgl.LngLatBounds();
   hikes.forEach(h=>{
-    const popup=new mapboxgl.Popup({ offset:22, closeButton:false })
-      .setHTML(popupHtmlFor(h));
-    popup.on("open",()=>{
-      if(window.innerWidth<600){
-        const ll=popup.getLngLat();
-        map.easeTo({ center:ll, offset:[0,-80], duration:400 });
-      }
-    });
-    const marker=new mapboxgl.Marker({color:RED})
-      .setLngLat(h.coords)
-      .setPopup(popup)
-      .addTo(map);
+    const popup=new mapboxgl.Popup({offset:22,closeButton:false}).setHTML(popupHtmlFor(h));
+    const marker=new mapboxgl.Marker({color:RED}).setLngLat(h.coords).setPopup(popup).addTo(map);
     const el=marker.getElement();
     el.classList.add("marker");
     markerElsById[h.id]=el;
@@ -389,14 +380,9 @@ map.on("load", async () => {
     }catch(e){}
   }
   const isMobile=window.innerWidth<600;
-  map.fitBounds(bounds,{
-    padding:isMobile?30:110,
-    maxZoom:isMobile?14:10.5
-  });
+  map.fitBounds(bounds,{padding:isMobile?30:110,maxZoom:isMobile?14:10.5});
   if(isMobile){
-    map.once("idle",()=>{
-      if(map.getZoom()>11.6) map.setZoom(11.6);
-    });
+    map.once("idle",()=>{if(map.getZoom()>11.6) map.setZoom(11.6);});
   }
 });
 </script>
