@@ -119,14 +119,6 @@
       body.ios-fullscreen .icon-img{ width:calc(9px * 1.15) !important; height:calc(9px * 1.15) !important }
     }
 
-    /* ===== SAFE +1PX FULLSCREEN TEXT ===== */
-    @media (max-width:440px){
-      body.ios-fullscreen .popup-heading{ font-size:calc(9.5px * 1.15 + 1px) !important }
-      body.ios-fullscreen .specs{ font-size:calc(8.5px * 1.15 + 1px) !important }
-      body.ios-fullscreen .spec-value{ font-size:calc(9.5px * 1.15 + 1px) !important }
-      body.ios-fullscreen .popup-link{ font-size:calc(10px * 1.15 + 1px) !important }
-    }
-
     /* ===== REMOVE TAP/FOCUS HIGHLIGHTS GLOBALLY ===== */
     .popup-link,
     .popup-link:focus,
@@ -143,41 +135,46 @@
       -webkit-user-select:none !important;
     }
 
-    /* ===== BOTTOM RIGHT: controls stacked ABOVE the attribution (i) ===== */
-    .mapboxgl-ctrl-bottom-right{
-      display:flex !important;
-      flex-direction:column !important;
-      align-items:flex-end !important;
-      gap:6px !important;
+    /* ===== BOTTOM RIGHT: General Stack Layout ===== */
+    .mapboxgl-ctrl-bottom-right {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      gap: 6px !important;
     }
+
+    /* Control the vertical order inside the corner */
     .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-group,
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen{
-      order:1;
-    }
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib{
-      order:3;
-    }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen { order: 1; }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib { order: 2; }
 
-    /* ===== DESKTOP ATTRIBUTION (Original Styling) ===== */
-    .mapboxgl-ctrl-attrib{ display:block !important }
-    .mapboxgl-ctrl-attrib.mapboxgl-compact{ margin:0 !important; padding:0 !important }
-    .mapboxgl-ctrl-attrib.mapboxgl-compact button{
-      width:29px !important;
-      height:29px !important;
-      margin:0 !important;
-      padding:0 !important;
-    }
-
-    /* ===== MOBILE ATTRIBUTION FIX (Transparent, White Icon, Moved Down) ===== */
+    /* ===== MOBILE: MOVE ENTIRE STACK DOWN 10PX & FIX 'i' ===== */
     @media (max-width: 440px) {
+      .mapboxgl-ctrl-bottom-right {
+        margin-bottom: -10px !important; /* Pulls the entire group down towards the edge */
+      }
+      
       .mapboxgl-ctrl-attrib.mapboxgl-compact {
         background-color: transparent !important;
-        margin-bottom: 30px !important; /* Total shift down */
+        box-shadow: none !important;
       }
+      
       .mapboxgl-ctrl-attrib.mapboxgl-compact button {
         background-color: transparent !important;
+        filter: invert(1) brightness(2) !important; /* Keep icon white */
         box-shadow: none !important;
-        filter: invert(1) brightness(2) !important;
+      }
+    }
+
+    /* ===== DESKTOP ATTRIBUTION (Your original code) ===== */
+    @media (min-width: 441px) {
+      .mapboxgl-ctrl-attrib { display: block !important; }
+      .mapboxgl-ctrl-attrib.mapboxgl-compact { margin: 0 !important; padding: 0 !important; }
+      .mapboxgl-ctrl-attrib.mapboxgl-compact button {
+        width: 29px !important;
+        height: 29px !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
     }
   </style>
