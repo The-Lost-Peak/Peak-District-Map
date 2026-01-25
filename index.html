@@ -119,14 +119,6 @@
       body.ios-fullscreen .icon-img{ width:calc(9px * 1.15) !important; height:calc(9px * 1.15) !important }
     }
 
-    /* ===== SAFE +1PX FULLSCREEN TEXT ===== */
-    @media (max-width:440px){
-      body.ios-fullscreen .popup-heading{ font-size:calc(9.5px * 1.15 + 1px) !important }
-      body.ios-fullscreen .specs{ font-size:calc(8.5px * 1.15 + 1px) !important }
-      body.ios-fullscreen .spec-value{ font-size:calc(9.5px * 1.15 + 1px) !important }
-      body.ios-fullscreen .popup-link{ font-size:calc(10px * 1.15 + 1px) !important }
-    }
-
     /* ===== REMOVE TAP/FOCUS HIGHLIGHTS GLOBALLY ===== */
     .popup-link,
     .popup-link:focus,
@@ -143,7 +135,7 @@
       -webkit-user-select:none !important;
     }
 
-    /* ===== BOTTOM RIGHT: controls stacked ABOVE the attribution (i) ===== */
+    /* ===== BOTTOM RIGHT CONTROLS ===== */
     .mapboxgl-ctrl-bottom-right{
       display:flex !important;
       flex-direction:column !important;
@@ -158,24 +150,29 @@
       order:3;
     }
 
-    /* ===== FIX: REMOVE GREY BOX FROM ATTRIBUTION (i) ===== */
+    /* ===== FIXED ATTRIBUTION (i) - NO GREY BOX, FORCED VISIBILITY ===== */
     .mapboxgl-ctrl-attrib { 
-      display:block !important; 
-      background: transparent !important; /* Removes background from container */
+      display: block !important; 
+      background: transparent !important; 
     }
+    
     .mapboxgl-ctrl-attrib.mapboxgl-compact { 
-      margin:0 !important; 
-      padding:0 !important; 
+      min-width: 30px !important;
+      min-height: 30px !important;
+      background: transparent !important;
     }
+
     .mapboxgl-ctrl-attrib.mapboxgl-compact button {
-      width:29px !important;
-      height:29px !important;
-      margin:0 !important;
-      padding:0 !important;
-      background-color: transparent !important; /* Removes grey circle/box */
-      background-image: none !important;
+      display: block !important;
+      visibility: visible !important;
+      width: 26px !important;
+      height: 26px !important;
+      background-color: transparent !important; /* The core request */
       border: none !important;
       box-shadow: none !important;
+      cursor: pointer !important;
+      /* This filter makes the black "i" icon white so it shows on satellite */
+      filter: invert(1) drop-shadow(0px 0px 1px black) !important; 
     }
   </style>
 </head>
