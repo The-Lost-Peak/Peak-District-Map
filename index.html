@@ -30,6 +30,7 @@
       text-transform:capitalize;
     }
 
+    /* ===== DESKTOP POPUP ===== */
     .popup-card{
       display:flex;
       align-items:stretch;
@@ -76,6 +77,7 @@
     .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none }
     .hike-gap{ margin-top:2px }
 
+    /* ===== MOBILE POPUP ===== */
     @media (max-width:440px){
       .popup-card{ height:115px !important }
       .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
@@ -94,6 +96,7 @@
       .icon-img{ width:9px !important; height:9px !important }
     }
 
+    /* ===== FULLSCREEN MOBILE POPUP ===== */
     @media (max-width:440px){
       body.ios-fullscreen .popup-card{ height:calc(115px * 1.15) !important }
       body.ios-fullscreen .img-wrap{
@@ -132,19 +135,20 @@
     }
 
     .mapboxgl-ctrl-bottom-right {
-      display:flex !important;
-      flex-direction:column !important;
-      align-items:flex-end !important;
-      gap:6px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      gap: 6px !important;
     }
 
     .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-group,
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen { order:1; }
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib { order:2; }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen { order: 1; }
+    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib { order: 2; }
 
+    /* ONLY CHANGE */
     .mapboxgl-ctrl-attrib{
-  transform: translate(-1px, 5px);
-}
+      transform: translate(-1px, 5px);
+    }
   </style>
 </head>
 
@@ -207,19 +211,18 @@ const map=new mapboxgl.Map({
 });
 
 const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
-map.addControl(nav,"bottom-right");
-map.addControl(new mapboxgl.FullscreenControl(),"bottom-right");
-map.addControl(new mapboxgl.AttributionControl({ compact:true }),"bottom-right");
+map.addControl(nav, "bottom-right");
+map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-right");
 
 function isIOS(){
-  const ua=navigator.userAgent||"";
-  const platform=navigator.platform||"";
-  return /iPad|iPhone|iPod/.test(ua)||(platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  const ua = navigator.userAgent || "";
+  const platform = navigator.platform || "";
+  return /iPad|iPhone|iPod/.test(ua) || (platform==="MacIntel" && navigator.maxTouchPoints>1);
 }
-
 const params=new URLSearchParams(location.search);
 
-if(isIOS()&&params.get("fs")==="1"){
+if(isIOS() && params.get("fs")==="1"){
   document.body.classList.add("ios-fullscreen");
   const hide=()=>{
     const el=document.querySelector(".mapboxgl-ctrl-fullscreen");
@@ -254,8 +257,8 @@ function addIOSFullscreenButton(){
   const compass=navGroup.querySelector(".mapboxgl-ctrl-compass");
 
   if(zoomOut){
-    navGroup.insertBefore(btn, compass||zoomOut.nextSibling);
-  }else{
+    navGroup.insertBefore(btn, compass || zoomOut.nextSibling);
+  } else {
     navGroup.appendChild(btn);
   }
 
@@ -265,8 +268,137 @@ function addIOSFullscreenButton(){
     window.open(url.toString(),"_blank");
   };
 }
+map.on("load", addIOSFullscreenButton);
 
-map.on("load",addIOSFullscreenButton);
+const icons={
+  clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
+  length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
+  ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
+  walk:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/walking-person-go-walk-move-svgrepo-com.svg">`,
+  directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
+};
+
+function specsHTML(s,u){
+  return `
+    <div class="specs">
+      <div class="stats-group">
+        <div class="spec-row">${icons.clock}<span class="spec-value">${s.duration}</span></div>
+        <div class="spec-row">${icons.length}<span class="spec-value">${s.length}</span></div>
+        <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
+      </div>
+      <div class="links-group">
+        <div class="spec-row hike-gap">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_blank">Hike Page</a></div>
+        <div class="spec-row">${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank">Directions</a></div>
+      </div>
+    </div>`;
+}
+function popupHtmlFor(h){
+  return `
+    <div class="popup-card">
+      <div class="img-wrap"><img src="${h.photo}" alt="${h.name}"></div>
+      <div class="popup-body">
+        <div class="popup-heading">${h.name}</div>
+        ${specsHTML(h.specs,{hikeUrl:h.hikeUrl,directionsUrl:h.directionsUrl})}
+      </div>
+    </div>`;
+}
+
+async function loadGpx(url){
+  const res=await fetch(url);
+  const xml=new DOMParser().parseFromString(await res.text(),"text/xml");
+  const gj=toGeoJSON.gpx(xml);
+  return gj.features.find(f=>f.geometry?.type==="LineString");
+}
+
+const routeLayerId={};
+const markerElsById={};
+let hoveredId=null;
+
+function setMarkerColor(id,color){
+  const el=markerElsById[id];
+  if(!el) return;
+  const p=el.querySelector("svg path");
+  if(p) p.setAttribute("fill",color);
+}
+function setRouteColor(id,color){
+  const lyr=routeLayerId[id];
+  if(lyr && map.getLayer(lyr)) map.setPaintProperty(lyr,"line-color",color);
+}
+function applyHoverState(){
+  Object.keys(routeLayerId).forEach(id=>setRouteColor(id,RED));
+  Object.keys(markerElsById).forEach(id=>setMarkerColor(id,RED));
+  if(hoveredId){
+    setRouteColor(hoveredId,BLUE);
+    setMarkerColor(hoveredId,BLUE);
+    map.getCanvas().style.cursor="pointer";
+  } else {
+    map.getCanvas().style.cursor="";
+  }
+}
+function setHovered(id){ hoveredId=id; applyHoverState(); }
+
+function addRoute(id,line){
+  const src=`route-src-${id}`;
+  const lyr=`route-lyr-${id}`;
+  if(!map.getSource(src)) map.addSource(src,{type:"geojson",data:line});
+  if(!map.getLayer(lyr)) map.addLayer({
+    id:lyr,
+    type:"line",
+    source:src,
+    paint:{
+      "line-color":RED,
+      "line-width":3,
+      "line-opacity":0.95,
+      "line-color-transition":{ duration:0 }
+    }
+  });
+  routeLayerId[id]=lyr;
+}
+
+map.on("load", async () => {
+  const bounds=new mapboxgl.LngLatBounds();
+  hikes.forEach(h=>{
+    const popup=new mapboxgl.Popup({ offset:22, closeButton:false })
+      .setHTML(popupHtmlFor(h));
+    popup.on("open",()=>{
+      if(window.innerWidth<600){
+        const ll=popup.getLngLat();
+        map.easeTo({ center:ll, offset:[0,-80], duration:400 });
+      }
+    });
+    const marker=new mapboxgl.Marker({color:RED})
+      .setLngLat(h.coords)
+      .setPopup(popup)
+      .addTo(map);
+    const el=marker.getElement();
+    el.classList.add("marker");
+    markerElsById[h.id]=el;
+    el.addEventListener("mouseenter",()=>setHovered(h.id));
+    el.addEventListener("mouseleave",()=>setHovered(null));
+    bounds.extend(h.coords);
+  });
+  for(const h of hikes){
+    try{
+      const line=await loadGpx(h.gpx);
+      if(line){
+        addRoute(h.id,line);
+        line.geometry.coordinates.forEach(c=>bounds.extend(c));
+        map.on("mouseenter",routeLayerId[h.id],()=>setHovered(h.id));
+        map.on("mouseleave",routeLayerId[h.id],()=>setHovered(null));
+      }
+    }catch(e){}
+  }
+  const isMobile=window.innerWidth<600;
+  map.fitBounds(bounds,{
+    padding:isMobile?30:110,
+    maxZoom:isMobile?14:10.5
+  });
+  if(isMobile){
+    map.once("idle",()=>{
+      if(map.getZoom()>11.6) map.setZoom(11.6);
+    });
+  }
+});
 </script>
 </body>
 </html>
