@@ -8,186 +8,204 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    html, body { margin:0; height:100% }
+    html, body { margin:0; height:100%; overflow:hidden; overscroll-behavior:none }
     #map { position:absolute; inset:0 }
 
+    /* ===== MARKERS ===== */
     .marker{ cursor:pointer !important }
-    .marker svg{ transform:scale(0.85); transform-origin:bottom center }
+    .marker svg{ transform:scale(.85); transform-origin:center; filter:drop-shadow(0 2px 3px rgba(0,0,0,.45)) }
 
-    .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)); }
-    .mapboxgl-popup-tip{ display:none !important; }
-
-    .mapboxgl-popup-content{
-      background:transparent !important;
-      border:none !important;
-      padding:0 !important;
-      box-shadow:none !important;
-      width:auto !important;
-      overflow:visible !important;
-      display:block;
-      box-sizing:border-box;
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
-      text-transform:capitalize;
-    }
-
-    /* ===== DESKTOP POPUP ===== */
-    .popup-card{
-      display:flex;
-      align-items:stretch;
-      background:#fff;
-      border-radius:12px;
-      overflow:hidden;
-      width:fit-content;
-      height:130px;
-    }
-    .img-wrap{
-      width:140px; flex:0 0 140px; height:100%;
-      border-radius:12px 0 0 12px;
-      overflow:hidden; background:#000;
-    }
-    .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block }
-
-    .popup-body{
-      box-sizing:border-box;
-      padding:8px 12px 10px 10px;
-      flex:0 0 140px;
-      min-width:140px; max-width:140px;
-      text-align:center;
-      display:flex; flex-direction:column;
-      justify-content:center;
-      line-height:1.2;
-      transform:translateY(-1px);
-    }
-
-    .popup-heading{ font-weight:800; font-size:11px; margin:2px 0 6px 0; color:#1E1E1E }
-    .specs{ font-size:10px; display:flex; flex-direction:column; gap:3px; align-items:center; margin-top:2px; transform:translateY(1px); }
-    .stats-group{ display:flex; flex-direction:column; gap:3px; align-items:center; transform:translateY(-2px); }
-    .links-group{ display:flex; flex-direction:column; gap:3px; align-items:center; }
-    .spec-row{ display:flex; align-items:center; justify-content:center; gap:4px }
-
-    .icon{ width:16px; height:16px }
-    .icon-red{ color:#EC2629 }
-    .icon-blue{ color:#3899EC }
-    .icon-img{
-      width:12px; height:12px; display:block;
-      filter: invert(41%) sepia(97%) saturate(1476%) hue-rotate(191deg) brightness(96%) contrast(101%);
-    }
-
-    .spec-value{ font-weight:800; color:#EC2629; font-size:11px }
-    .popup-link{ color:#3899EC; font-weight:800; font-size:11px; text-decoration:none }
-    .hike-gap{ margin-top:2px }
-
-    /* ===== MOBILE POPUP ===== */
+    /* ===== POPUP (matches The Ethels map) ===== */
+    .mapboxgl-popup{ filter:drop-shadow(0 14px 28px rgba(0,0,0,.45)) }
+    .mapboxgl-popup-tip{ display:none !important }
+    .mapboxgl-popup-content{background:0 0!important;border:none!important;padding:0!important;box-shadow:none!important;width:auto!important;overflow:visible!important;display:block;box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif!important;text-transform:capitalize}
+    .popup-card{display:flex;align-items:stretch;background:#fff;border-radius:12px;overflow:hidden;width:fit-content;height:185px;position:relative;gap:0}
+    .img-wrap{width:150px;flex:0 0 150px;height:185px;border-radius:12px 0 0 12px;overflow:hidden;background:#000;display:block;line-height:0;flex-shrink:0;margin-right:-1px}
+    .img-wrap img{width:100%;height:100%;object-fit:cover;display:block;border:none;outline:0}
+    .popup-body{box-sizing:border-box;padding:2px 10px;flex:0 0 165px;min-width:165px;max-width:165px;text-align:center;display:flex;flex-direction:column;justify-content:center;line-height:1.2;transform:translateY(-1px)}
+    .popup-heading{font-weight:800;font-size:12px;margin:0 0 5px 0;color:#1e1e1e;position:relative;top:2px}
+    .specs{font-size:11px;display:flex;flex-direction:column;gap:3px;align-items:center;margin-top:2px;position:relative;top:-2px}
+    .stats-group{display:flex;flex-direction:column;gap:3px;align-items:center}
+    .links-group{display:flex;flex-direction:column;gap:3px;align-items:center;margin-top:1px;width:100%}
+    .spec-row{display:flex;align-items:center;justify-content:center;gap:4px}
+    .icon{width:13px;height:13px;flex-shrink:0}
+    .icon-red{color:#ec2629}
+    .icon-blue{color:#3899ec}
+    .spec-value{font-weight:800;color:#ec2629;font-size:11.5px}
+    .popup-link{color:#3899ec;font-weight:800;font-size:11.5px;text-decoration:none;display:flex;align-items:center;gap:3px}
+    .popup-link:hover{text-decoration:underline}
+    .close-btn{position:absolute;top:5px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;line-height:1;z-index:2;padding:0;outline:0;box-shadow:none}
+    .close-btn:hover{background:rgba(0,0,0,.75)}
+    .close-btn:active,.close-btn:focus,.close-btn:focus-visible{outline:0;box-shadow:none;border:none}
+    .eye-btn{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;padding:0;outline:0;box-shadow:none;-webkit-appearance:none!important;appearance:none!important}
+    .eye-btn:hover{background:rgba(0,0,0,.75)}
+    .eye-btn:active,.eye-btn:focus,.eye-btn:focus-visible{outline:0;box-shadow:none;border:none}
+    .eye-btn,.eye-btn *{-webkit-tap-highlight-color:transparent!important;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important}
+    .marker-eye-overlay{display:none;position:absolute;width:0;height:0;overflow:visible;top:-10px;left:50%;transform:translateX(-50%);pointer-events:none}
+    .marker-eye-overlay>div{pointer-events:auto;cursor:pointer}
+    .marker.info-hidden .marker-eye-overlay{display:block;pointer-events:auto}
+    .popup-link,.popup-link:active,.popup-link:focus,.popup-link:focus-visible{background:0 0!important;outline:0!important;border:none!important;box-shadow:none!important}
+    .popup-link,.popup-link *{-webkit-tap-highlight-color:transparent!important;-webkit-touch-callout:none!important;-webkit-user-select:none!important}
     @media (max-width:440px){
-      .popup-card{ height:115px !important }
-      .img-wrap{ width:105px !important; flex-basis:105px !important; height:115px !important }
-      .popup-body{
-        flex:0 0 105px !important;
-        min-width:105px !important;
-        max-width:105px !important;
-        padding:4px 6px !important;
-      }
-
-      .popup-heading{ font-size:9.5px !important }
-      .specs{ font-size:8.5px !important }
-      .spec-value{ font-size:9.5px !important }
-      .popup-link{ font-size:10px !important }
-      .icon{ width:11px !important; height:11px !important }
-      .icon-img{ width:9px !important; height:9px !important }
+      body:not(.fs-mode) .popup-card{height:170px!important}
+      body:not(.fs-mode) .img-wrap{width:130px!important;flex-basis:130px!important;height:170px!important}
+      body:not(.fs-mode) .popup-body{flex:0 0 130px!important;min-width:130px!important;max-width:130px!important;padding:4px 6px!important}
+      body:not(.fs-mode) .popup-heading{font-size:10.5px!important}
+      body:not(.fs-mode) .specs{font-size:9.5px!important}
+      body:not(.fs-mode) .spec-value{font-size:10px!important}
+      body:not(.fs-mode) .popup-link{font-size:10px!important}
+      body:not(.fs-mode) .icon{width:11px!important;height:11px!important}
     }
 
-    /* ===== FULLSCREEN MOBILE POPUP ===== */
-    @media (max-width:440px){
-      body.ios-fullscreen .popup-card{ height:calc(115px * 1.15) !important }
-      body.ios-fullscreen .img-wrap{
-        width:calc(105px * 1.15) !important;
-        flex-basis:calc(105px * 1.15) !important;
-        height:calc(115px * 1.15) !important;
-      }
-      body.ios-fullscreen .popup-body{
-        flex:0 0 calc(105px * 1.15) !important;
-        min-width:calc(105px * 1.15) !important;
-        max-width:calc(105px * 1.15) !important;
-        padding:calc(4px * 1.15) calc(6px * 1.15) !important;
-      }
-
-      body.ios-fullscreen .popup-heading{ font-size:calc(9.5px * 1.15) !important }
-      body.ios-fullscreen .specs{ font-size:calc(8.5px * 1.15) !important }
-      body.ios-fullscreen .spec-value{ font-size:calc(9.5px * 1.15) !important }
-      body.ios-fullscreen .popup-link{ font-size:calc(10px * 1.15) !important }
-      body.ios-fullscreen .icon{ width:calc(11px * 1.15) !important; height:calc(11px * 1.15) !important }
-      body.ios-fullscreen .icon-img{ width:calc(9px * 1.15) !important; height:calc(9px * 1.15) !important }
+    /* ===== MAP BUTTONS (matches The Ethels map) ===== */
+    .fs-btn{position:absolute;bottom:50px;right:20px;z-index:10;width:50px;height:50px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:.15s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 1px rgba(255,255,255,.85),inset 0 -2px 6px rgba(255,255,255,.25),0 4px 14px rgba(0,0,0,.28);-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%)}
+    @supports((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){.fs-btn{background:rgba(255,255,255,.28)}}
+    @media(hover:hover){.fs-btn:hover{background:rgba(56,153,236,.35)}}
+    .fs-btn:focus{outline:0}
+    .fs-btn:active{background:rgba(255,255,255,.45)}
+    .fs-btn svg{fill:none;stroke:#1c1c1e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;width:22px;height:22px;display:block;filter:drop-shadow(0 1px 1px rgba(255,255,255,.6))}
+    #map-btn-fullscreen,#map-btn-layers,#map-btn-locate,#map-btn-reset{position:absolute;right:20px;width:50px;height:50px}
+    #map-btn-fullscreen{bottom:50px}
+    #map-btn-locate{bottom:110px}
+    #map-btn-layers{bottom:170px}
+    #map-btn-reset{bottom:230px}
+    @media (max-width:767px){
+      body:not(.fs-mode) #map-btn-fullscreen,body:not(.fs-mode) #map-btn-layers,body:not(.fs-mode) #map-btn-locate,body:not(.fs-mode) #map-btn-reset{width:38px!important;height:38px!important;right:11px!important}
+      body:not(.fs-mode) #map-btn-fullscreen{bottom:49px!important}
+      body:not(.fs-mode) #map-btn-locate{bottom:97px!important}
+      body:not(.fs-mode) #map-btn-layers{bottom:145px!important}
+      body:not(.fs-mode) #map-btn-reset{bottom:193px!important}
+      body:not(.fs-mode) #map-btn-fullscreen svg,body:not(.fs-mode) #map-btn-layers svg,body:not(.fs-mode) #map-btn-locate svg,body:not(.fs-mode) #map-btn-reset svg{width:16px!important;height:16px!important}
+      body.fs-mode #map-btn-fullscreen,body.fs-mode #map-btn-layers,body.fs-mode #map-btn-locate,body.fs-mode #map-btn-reset{width:46px!important;height:46px!important;right:16px!important}
+      body.fs-mode #map-btn-fullscreen{bottom:46px!important}
+      body.fs-mode #map-btn-locate{bottom:102px!important}
+      body.fs-mode #map-btn-layers{bottom:158px!important}
+      body.fs-mode #map-btn-reset{bottom:214px!important}
+      body.fs-mode #map-btn-fullscreen svg,body.fs-mode #map-btn-layers svg,body.fs-mode #map-btn-locate svg,body.fs-mode #map-btn-reset svg{width:20px!important;height:20px!important}
     }
-
-    /* ===== REMOVE TAP/FOCUS HIGHLIGHTS ===== */
-    .eye-btn {
-      position:absolute; top:6px; left:6px; background:rgba(0,0,0,.5);
-      border:0; border-radius:50%; width:20px; height:20px; cursor:pointer;
-      display:flex; align-items:center; justify-content:center; z-index:2; padding:0;
-      margin:0;
-      appearance:none;
-      -webkit-appearance:none;
-      outline:none;
-      box-shadow:none;
-      -webkit-tap-highlight-color:transparent;
-      -webkit-touch-callout:none;
-      touch-action:manipulation;
-    }
-    .eye-btn:hover { background:rgba(0,0,0,.75); }
-    .eye-btn:focus,
-    .eye-btn:focus-visible,
-    .eye-btn:active {
-      outline:none !important;
-      box-shadow:none !important;
-      border:0 !important;
-      -webkit-tap-highlight-color:transparent !important;
-    }
-    .marker-eye-overlay {
-      display:none; position:absolute; width:0; height:0; overflow:visible;
-      top:-10px; left:50%; transform:translateX(-50%); pointer-events:none;
-    }
-    .marker-eye-overlay > div { pointer-events:auto; cursor:pointer; }
-    .marker.info-hidden .marker-eye-overlay { display:block; pointer-events:auto; }
-
-    .popup-link,
-    .popup-link:focus,
-    .popup-link:active,
-    .popup-link:focus-visible{
-      background:transparent !important;
-      outline:none !important;
-      border:none !important;
-      box-shadow:none !important;
-    }
-    .popup-link, .popup-link *{
-      -webkit-tap-highlight-color:transparent !important;
-      -webkit-touch-callout:none !important;
-      -webkit-user-select:none !important;
-    }
-
-    /* ===== BOTTOM RIGHT STACK ===== */
-    .mapboxgl-ctrl-bottom-right {
-      display:flex !important;
-      flex-direction:column !important;
-      align-items:flex-end !important;
-      gap:6px !important;
-    }
-
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-group,
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-fullscreen { order:1; }
-    .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib { order:2; }
-
-    /* ===== ATTRIBUTION POSITION (ONLY CHANGE) ===== */
-    .mapboxgl-ctrl-attrib{
-      transform: translate(-1px, 3px);
-    }
+    .mapboxgl-ctrl-attrib{position:absolute;bottom:5px;right:6px}
+    #lp-toast{display:none;position:absolute;left:50%;bottom:110px;transform:translateX(-50%);z-index:30;background:rgba(30,30,30,.92);color:#fff;padding:10px 14px;border-radius:8px;font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.28);white-space:nowrap}
+    #lp-toast.show{display:block}
   </style>
 </head>
 
 <body>
 <div id="map"></div>
-
+<button id="map-btn-fullscreen" class="fs-btn" title="Fullscreen"><svg id="fsIconExpand" viewBox="0 0 24 24" style="display:block"><polyline points="4,9 4,4 9,4"/><polyline points="20,9 20,4 15,4"/><polyline points="4,15 4,20 9,20"/><polyline points="20,15 20,20 15,20"/></svg><svg id="fsIconCollapse" viewBox="0 0 24 24" style="display:none"><polyline points="9,4 4,4 4,9"/><polyline points="15,4 20,4 20,9"/><polyline points="9,20 4,20 4,15"/><polyline points="15,20 20,20 20,15"/></svg></button>
+<button id="map-btn-locate" class="fs-btn" title="Show my location"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="display:block"><circle cx="12" cy="12" r="4"></circle><circle cx="12" cy="12" r="8"></circle><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg></button>
+<button id="map-btn-layers" class="fs-btn" title="Switch basemap"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 15.5 12 22 22 15.5"></polyline></svg></button>
+<button id="map-btn-reset" class="fs-btn" title="Reset view"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg></button>
+<div id="lp-toast"></div>
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 <script src="https://unpkg.com/@tmcw/togeojson@5.8.0/dist/togeojson.umd.js"></script>
+<script>
+/* ===== MAP BUTTONS: reset / layers / locate / fullscreen (matches The Ethels map) ===== */
+function lpInitControls(opts){
+  const map=opts.map;
+  const $=id=>document.getElementById(id);
+  const params=new URLSearchParams(location.search);
+  const ios=/iPad|iPhone|iPod/.test(navigator.userAgent||"")||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  const fsTab=params.get("fs")==="1";
+  if(fsTab) document.body.classList.add("fs-mode");
+
+  map.addControl(new mapboxgl.AttributionControl({compact:true}),"bottom-right");
+
+  function flash(b){ if(!b) return; b.style.background="rgba(56,153,236,0.55)"; setTimeout(()=>{ b.style.background=""; if(b.blur) b.blur(); },500); }
+  let toastTimer=null;
+  function toast(msg){ const t=$("lp-toast"); if(!t) return; t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),3000); }
+
+  /* Reset */
+  $("map-btn-reset").addEventListener("click",e=>{ flash(e.currentTarget); opts.reset(); });
+
+  /* Layers */
+  let styleIdx=0;
+  $("map-btn-layers").addEventListener("click",e=>{
+    flash(e.currentTarget);
+    styleIdx=1-styleIdx;
+    map.once("style.load",()=>{
+      try{ if(opts.afterStyle) opts.afterStyle(); }catch(err){}
+      if(loc.on && loc.pt) drawLoc();
+    });
+    map.setStyle(opts.styles[styleIdx]);
+  });
+
+  /* Fullscreen */
+  const isFs=()=>document.fullscreenElement||document.webkitFullscreenElement;
+  function updFsIcons(){
+    const on=!!isFs()||(fsTab&&ios);
+    $("fsIconExpand").style.display=on?"none":"block";
+    $("fsIconCollapse").style.display=on?"block":"none";
+  }
+  document.addEventListener("fullscreenchange",updFsIcons);
+  document.addEventListener("webkitfullscreenchange",updFsIcons);
+  updFsIcons();
+  $("map-btn-fullscreen").addEventListener("click",()=>{
+    if(fsTab&&ios){ window.close(); return; }
+    if(ios){ const u=new URL(location.href); u.searchParams.set("fs","1"); window.open(u.toString(),"_blank"); return; }
+    if(!isFs()){ const el=document.documentElement; (el.requestFullscreen||el.webkitRequestFullscreen).call(el); }
+    else{ (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+  });
+
+  /* Locate */
+  const loc={on:false,first:true,pt:null,acc:0,timer:null,bridgeTimer:null,useBridge:false};
+  const EMPTY={type:"FeatureCollection",features:[]};
+  const inFrame=(()=>{ try{ return window.self!==window.top; }catch(e){ return true; } })();
+  function circle(lng,lat,m){
+    const pts=[],dLat=m/110540,dLng=m/(111320*Math.cos(lat*Math.PI/180));
+    for(let i=0;i<=48;i++){ const a=i/48*2*Math.PI; pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]); }
+    return {type:"Feature",geometry:{type:"Polygon",coordinates:[pts]}};
+  }
+  function ensureLocLayers(){
+    if(!map.getSource("lp-me")) map.addSource("lp-me",{type:"geojson",data:EMPTY});
+    if(!map.getSource("lp-acc")) map.addSource("lp-acc",{type:"geojson",data:EMPTY});
+    if(!map.getLayer("lp-acc-fill")) map.addLayer({id:"lp-acc-fill",type:"fill",source:"lp-acc",paint:{"fill-color":"#3899EC","fill-opacity":.15}});
+    if(!map.getLayer("lp-acc-line")) map.addLayer({id:"lp-acc-line",type:"line",source:"lp-acc",paint:{"line-color":"#3899EC","line-width":1.5,"line-opacity":.5}});
+    if(!map.getLayer("lp-me-dot")) map.addLayer({id:"lp-me-dot",type:"circle",source:"lp-me",paint:{"circle-radius":7,"circle-color":"#3899EC","circle-stroke-width":3,"circle-stroke-color":"#fff"}});
+  }
+  function drawLoc(){
+    ensureLocLayers();
+    map.getSource("lp-me").setData(loc.pt?{type:"Feature",geometry:{type:"Point",coordinates:loc.pt}}:EMPTY);
+    map.getSource("lp-acc").setData(loc.pt&&loc.acc>0?circle(loc.pt[0],loc.pt[1],loc.acc):EMPTY);
+  }
+  function gotLoc(lat,lng,acc){
+    if(!loc.on) return;
+    clearTimeout(loc.bridgeTimer);
+    loc.pt=[lng,lat]; loc.acc=acc||0; drawLoc();
+    if(loc.first){ loc.first=false; map.flyTo({center:loc.pt,zoom:Math.max(map.getZoom(),14),duration:1000}); }
+    clearTimeout(loc.timer); loc.timer=setTimeout(requestLoc,5000);
+  }
+  function locFail(msg){ stopLoc(); toast(msg||"Location unavailable"); }
+  function askBridge(){
+    loc.useBridge=true;
+    try{ (window.opener&&!window.opener.closed?window.opener:window.parent).postMessage({type:"requestLocation"},"*"); }catch(e){}
+    clearTimeout(loc.bridgeTimer);
+    loc.bridgeTimer=setTimeout(()=>locFail("Location unavailable"),8000);
+  }
+  function requestLoc(){
+    if(!loc.on) return;
+    if(loc.useBridge){ askBridge(); return; }
+    if(!navigator.geolocation){ inFrame?askBridge():locFail("Location not supported"); return; }
+    navigator.geolocation.getCurrentPosition(
+      p=>gotLoc(p.coords.latitude,p.coords.longitude,p.coords.accuracy),
+      err=>{ if(inFrame&&loc.first) askBridge(); else locFail(err&&err.message?err.message:"Location unavailable"); },
+      {enableHighAccuracy:true,timeout:7500,maximumAge:0}
+    );
+  }
+  function startLoc(){ loc.on=true; loc.first=true; $("map-btn-locate").style.background="rgba(56,153,236,0.55)"; requestLoc(); }
+  function stopLoc(){
+    loc.on=false; loc.pt=null; loc.useBridge=false;
+    clearTimeout(loc.timer); clearTimeout(loc.bridgeTimer);
+    if(map.getSource("lp-me")) drawLoc();
+    $("map-btn-locate").style.background="";
+  }
+  $("map-btn-locate").addEventListener("click",()=>{ loc.on?stopLoc():startLoc(); });
+  window.addEventListener("message",e=>{
+    const d=e.data; if(!d||!d.type||!loc.on) return;
+    if(d.type==="userLocation") gotLoc(d.lat,d.lng,d.accuracy);
+    else if(d.type==="locationError") locFail(d.message);
+  });
+}
+</script>
 
 <script>
 mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
@@ -233,79 +251,22 @@ const hikes=[
   }
 ];
 
+const MAP_STYLES=["mapbox://styles/mapbox/satellite-streets-v12","mapbox://styles/mapbox/outdoors-v12"];
+
 const map=new mapboxgl.Map({
   container:"map",
-  style:"mapbox://styles/mapbox/satellite-streets-v12",
+  style:MAP_STYLES[0],
   center:[-1.78,53.41],
   zoom:11,
   attributionControl:false
 });
 
-const nav=new mapboxgl.NavigationControl({ showCompass:true, showZoom:true });
-map.addControl(nav,"bottom-right");
-map.addControl(new mapboxgl.FullscreenControl(),"bottom-right");
-map.addControl(new mapboxgl.AttributionControl({ compact:true }),"bottom-right");
-
-function isIOS(){
-  const ua=navigator.userAgent||"";
-  const platform=navigator.platform||"";
-  return /iPad|iPhone|iPod/.test(ua)||(platform==="MacIntel"&&navigator.maxTouchPoints>1);
-}
-
-const params=new URLSearchParams(location.search);
-
-if(isIOS()&&params.get("fs")==="1"){
-  document.body.classList.add("ios-fullscreen");
-  const hide=()=>{
-    const el=document.querySelector(".mapboxgl-ctrl-fullscreen");
-    if(el) el.style.display="none";
-  };
-  hide(); setTimeout(hide,500);
-}
-
-function addIOSFullscreenButton(){
-  if(!isIOS()) return;
-  if(params.get("fs")==="1") return;
-
-  const corner=document.querySelector(".mapboxgl-ctrl-bottom-right");
-  if(!corner) return;
-
-  const navGroup=[...corner.querySelectorAll(".mapboxgl-ctrl-group")]
-    .find(g=>g.querySelector(".mapboxgl-ctrl-zoom-in"));
-  if(!navGroup) return;
-
-  const btn=document.createElement("button");
-  btn.className="mapboxgl-ctrl-icon ios-fs-btn";
-  btn.id="iosFullscreenBtn";
-  btn.innerHTML=`
-    <svg viewBox="0 0 24 24">
-      <polyline points="4,9 4,4 9,4" fill="none" stroke="#000" stroke-width="2"/>
-      <polyline points="20,9 20,4 15,4" fill="none" stroke="#000" stroke-width="2"/>
-      <polyline points="4,15 4,20 9,20" fill="none" stroke="#000" stroke-width="2"/>
-      <polyline points="20,15 20,20 15,20" fill="none" stroke="#000" stroke-width="2"/>
-    </svg>`;
-  const zoomOut=navGroup.querySelector(".mapboxgl-ctrl-zoom-out");
-  const compass=navGroup.querySelector(".mapboxgl-ctrl-compass");
-  if(zoomOut){
-    navGroup.insertBefore(btn,compass||zoomOut.nextSibling);
-  }else{
-    navGroup.appendChild(btn);
-  }
-  btn.onclick=()=>{
-    const url=new URL(location.href);
-    url.searchParams.set("fs","1");
-    window.open(url.toString(),"_blank");
-  };
-}
-
-map.on("load",addIOSFullscreenButton);
-
 const icons={
-  clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>`,
-  length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18"/><path d="M6 8v8M10 8v8M14 8v8M18 8v8"/></svg>`,
-  ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M6 18l5-6 4 4 5-7"/><path d="M20 7h-5v5"/></svg>`,
-  walk:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/walking-person-go-walk-move-svgrepo-com.svg">`,
-  directions:`<img class="icon-img" src="https://raw.githubusercontent.com/remmiagbebi-beep/peak-district-map/main/icons/marker-svgrepo-com.svg">`
+  clock:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  length:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative;left:1px;width:14.3px;height:14.3px"><path d="M2 8h20v8H2z"/><path d="M6 8v4M10 8v3M14 8v4M18 8v3"/></svg>`,
+  ascent:`<svg class="icon icon-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="position:relative;top:-1px;left:1px"><path d="M3 20h18"/><path d="M6 18l4-5 4 3 5-8"/></svg>`,
+  walk:`<svg class="icon icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 17l4-8 4 5 3-3 4 6"/><circle cx="18" cy="5" r="2"/></svg>`,
+  directions:`<svg class="icon icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s-8-5.5-8-11.5a8 8 0 0 1 16 0C20 16.5 12 22 12 22z"/><circle cx="12" cy="10.5" r="2.5"/></svg>`
 };
 
 function specsHTML(s,u){
@@ -317,16 +278,17 @@ function specsHTML(s,u){
         <div class="spec-row">${icons.ascent}<span class="spec-value">${s.ascent}</span></div>
       </div>
       <div class="links-group">
-        <div class="spec-row hike-gap">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_top">Hike Page</a></div>
-        <div class="spec-row">${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank" rel="noopener">Directions</a></div>
+        <div class="spec-row">${icons.walk}<a class="popup-link" href="${u.hikeUrl}" target="_top">Hike Page</a></div>
+        <div class="spec-row">${icons.directions}<a class="popup-link" href="${u.directionsUrl}" target="_blank" rel="noopener">Directions ↗</a></div>
       </div>
     </div>`;
 }
-function popupHtmlFor(h){
-  const eyeBtn=`<button class="eye-btn" onclick="toggleInfo('${h.id}',event)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>`;
+function popupHtmlFor(h,locked){
+  const eyeBtn=`<button class="eye-btn" onclick="toggleInfo('${h.id}',event)" title="Hide pop up to see route"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>`;
+  const closeBtn=locked?`<button class="close-btn" onclick="closeLocked(event)" title="Close">&#x2715;</button>`:"";
   return `
     <div class="popup-card">
-      ${eyeBtn}
+      ${eyeBtn}${closeBtn}
       <div class="img-wrap"><img src="${h.photo}" alt="${h.name}"></div>
       <div class="popup-body">
         <div class="popup-heading">${h.name}</div>
@@ -343,9 +305,13 @@ async function loadGpx(url){
 }
 
 const markerElsById={};
-const routeLayers={}, routeAnims={};
+const routeLayers={}, routeAnims={}, routeLines={};
+const lockedPopups={};
+const infoHiddenIds=new Set();
 let lockedId=null;
 let hoverPopupObj=null;
+const HOME_BOUNDS=new mapboxgl.LngLatBounds();
+const isMobile=window.innerWidth<=768;
 
 function setMarkerColor(id,color){
   const el=markerElsById[id];
@@ -363,10 +329,10 @@ function addRoute(h,lineFeature){
   }
   const total=dists[dists.length-1];
   const srcBase=`rb-${id}`,srcAnim=`ra-${id}`,lyrBase=`rl-${id}`,lyrAnim=`la-${id}`;
-  map.addSource(srcBase,{type:"geojson",data:lineFeature});
-  map.addLayer({id:lyrBase,type:"line",source:srcBase,paint:{"line-color":RED,"line-width":3.5,"line-opacity":0.7}});
-  map.addSource(srcAnim,{type:"geojson",lineMetrics:true,data:{type:"Feature",geometry:{type:"LineString",coordinates:[]}}});
-  map.addLayer({id:lyrAnim,type:"line",source:srcAnim,layout:{"line-cap":"round","line-join":"round"},paint:{
+  if(!map.getSource(srcBase)) map.addSource(srcBase,{type:"geojson",data:lineFeature});
+  if(!map.getLayer(lyrBase)) map.addLayer({id:lyrBase,type:"line",source:srcBase,paint:{"line-color":RED,"line-width":3.5,"line-opacity":0.7}});
+  if(!map.getSource(srcAnim)) map.addSource(srcAnim,{type:"geojson",lineMetrics:true,data:{type:"Feature",geometry:{type:"LineString",coordinates:[]}}});
+  if(!map.getLayer(lyrAnim)) map.addLayer({id:lyrAnim,type:"line",source:srcAnim,layout:{"line-cap":"round","line-join":"round"},paint:{
     "line-width":3.5,
     "line-opacity":0,
     "line-gradient":["interpolate",["linear"],["line-progress"],0,"#3899EC",1,"#FF8C00"]
@@ -375,14 +341,14 @@ function addRoute(h,lineFeature){
 }
 
 function showRoute(id){
-  const r=routeLayers[id]; if(!r) return;
+  const r=routeLayers[id]; if(!r||!map.getLayer(r.lyrAnim)) return;
   map.setPaintProperty(r.lyrAnim,"line-opacity",1);
   startAnim(id);
 }
 function hideRoute(id){
   const r=routeLayers[id]; if(!r) return;
   stopAnim(id);
-  map.setPaintProperty(r.lyrAnim,"line-opacity",0);
+  if(map.getLayer(r.lyrAnim)) map.setPaintProperty(r.lyrAnim,"line-opacity",0);
 }
 function startAnim(id){
   stopAnim(id);
@@ -418,7 +384,7 @@ function showHoverPopup(h){
   if(hoverPopupObj){ hoverPopupObj.remove(); hoverPopupObj=null; }
   setMarkerColor(h.id,BLUE); showRoute(h.id);
   hoverPopupObj=new mapboxgl.Popup({offset:22,closeButton:false,closeOnClick:false,anchor:"bottom"})
-    .setLngLat(h.coords).setHTML(popupHtmlFor(h)).addTo(map);
+    .setLngLat(h.coords).setHTML(popupHtmlFor(h,false)).addTo(map);
 }
 function hideHoverPopup(id){
   if(lockedId===id) return;
@@ -435,29 +401,44 @@ function lockHike(h){
   lockedId=h.id; setMarkerColor(h.id,BLUE); showRoute(h.id);
   map.panTo(h.coords,{duration:300});
   const p=new mapboxgl.Popup({offset:22,closeButton:false,closeOnClick:false,anchor:"bottom"})
-    .setLngLat(h.coords).setHTML(popupHtmlFor(h)).addTo(map);
+    .setLngLat(h.coords).setHTML(popupHtmlFor(h,true)).addTo(map);
   lockedPopups[h.id]=p;
 }
-const lockedPopups={};
-function closeLocked(){
+function closeLocked(evt){
+  if(evt){ evt.preventDefault(); evt.stopPropagation(); }
   if(lockedId!==null){
     hideRoute(lockedId); setMarkerColor(lockedId,RED);
     if(lockedPopups[lockedId]){ lockedPopups[lockedId].remove(); delete lockedPopups[lockedId]; }
+    const el=markerElsById[lockedId]; if(el) el.classList.remove("info-hidden");
+    infoHiddenIds.delete(lockedId);
     lockedId=null;
   }
 }
+window.closeLocked=closeLocked;
 
-const isMobile=window.innerWidth<=768;
+function resetMapView(){
+  if(HOME_BOUNDS.isEmpty()) return;
+  map.fitBounds(HOME_BOUNDS,{padding:isMobile?30:110,maxZoom:isMobile?14:10.5,duration:900});
+}
+
+lpInitControls({
+  map,
+  styles:MAP_STYLES,
+  reset:resetMapView,
+  afterStyle:()=>{
+    hikes.forEach(h=>{ if(routeLines[h.id]) addRoute(h,routeLines[h.id]); });
+    if(lockedId) showRoute(lockedId);
+  }
+});
 
 map.on("load",async()=>{
-  const bounds=new mapboxgl.LngLatBounds();
   hikes.forEach(h=>{
     const el=document.createElement("div");
     el.className="marker";
     el.innerHTML=`<svg width="27" height="41" viewBox="0 0 27 41" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 0C6.044 0 0 6.044 0 13.5c0 9.375 13.5 27.5 13.5 27.5S27 22.875 27 13.5C27 6.044 20.956 0 13.5 0z" fill="${RED}"/><circle cx="13.5" cy="13.5" r="5" fill="white" opacity="0.9"/></svg><div class="marker-eye-overlay"><div onclick="toggleInfo('${h.id}',event)" style="position:absolute;top:-11px;left:-11px;width:22px;height:22px;background:rgba(0,0,0,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg></div></div>`;
     markerElsById[h.id]=el;
     new mapboxgl.Marker({element:el}).setLngLat(h.coords).addTo(map);
-    bounds.extend(h.coords);
+    HOME_BOUNDS.extend(h.coords);
     if(!isMobile){
       el.addEventListener("mouseenter",()=>{ if(lockedId!==h.id&&!infoHiddenIds.has(h.id)) showHoverPopup(h); });
       el.addEventListener("mouseleave",()=>{ if(lockedId!==h.id&&!infoHiddenIds.has(h.id)) hideHoverPopup(h.id); });
@@ -469,86 +450,49 @@ map.on("load",async()=>{
     try{
       const line=await loadGpx(h.gpx);
       if(line){
+        routeLines[h.id]=line;
         addRoute(h,line);
-        line.geometry.coordinates.forEach(c=>bounds.extend(c));
+        line.geometry.coordinates.forEach(c=>HOME_BOUNDS.extend(c));
       }
     }catch(e){}
   }
-  map.fitBounds(bounds,{padding:isMobile?30:110,maxZoom:isMobile?14:10.5});
+  map.fitBounds(HOME_BOUNDS,{padding:isMobile?30:110,maxZoom:isMobile?14:10.5});
   if(isMobile){
-    map.once("idle",()=>{if(map.getZoom()>11.6) map.setZoom(11.6);});
+    map.once("idle",()=>{ if(map.getZoom()>11.6) map.setZoom(11.6); });
   }
 });
 
-const infoHiddenIds=new Set();
-
 window.toggleInfo=function(id,evt){
-  if(evt){
-    evt.preventDefault();
-    evt.stopPropagation();
-  }
-
+  if(evt){ evt.preventDefault(); evt.stopPropagation(); }
   const el=markerElsById[id];
   const h=hikes.find(x=>x.id===id);
   if(!h) return;
 
-  /* Show the popup again by creating a fresh Mapbox popup.
-     This avoids leaving an invisible popup element over the map. */
   if(infoHiddenIds.has(id)){
     infoHiddenIds.delete(id);
     if(el) el.classList.remove("info-hidden");
-
-    if(lockedPopups[id]){
-      lockedPopups[id].remove();
-      delete lockedPopups[id];
-    }
-
+    if(lockedPopups[id]){ lockedPopups[id].remove(); delete lockedPopups[id]; }
     lockedId=id;
-    const p=new mapboxgl.Popup({
-      offset:22,
-      closeButton:false,
-      closeOnClick:false,
-      anchor:"bottom"
-    })
-      .setLngLat(h.coords)
-      .setHTML(popupHtmlFor(h))
-      .addTo(map);
-
+    const p=new mapboxgl.Popup({offset:22,closeButton:false,closeOnClick:false,anchor:"bottom"})
+      .setLngLat(h.coords).setHTML(popupHtmlFor(h,true)).addTo(map);
     lockedPopups[id]=p;
     return;
   }
 
-  if(hoverPopupObj){
-    hoverPopupObj.remove();
-    hoverPopupObj=null;
-  }
+  if(hoverPopupObj){ hoverPopupObj.remove(); hoverPopupObj=null; }
 
   if(lockedId!==null&&lockedId!==id){
     hideRoute(lockedId);
-
-    if(lockedPopups[lockedId]){
-      lockedPopups[lockedId].remove();
-      delete lockedPopups[lockedId];
-    }
-
+    if(lockedPopups[lockedId]){ lockedPopups[lockedId].remove(); delete lockedPopups[lockedId]; }
     setMarkerColor(lockedId,RED);
     infoHiddenIds.delete(lockedId);
-
-    if(markerElsById[lockedId]){
-      markerElsById[lockedId].classList.remove("info-hidden");
-    }
+    if(markerElsById[lockedId]) markerElsById[lockedId].classList.remove("info-hidden");
   }
 
   lockedId=id;
   infoHiddenIds.add(id);
-
-  /* Remove the popup from the DOM rather than making it transparent.
-     A transparent Mapbox popup can still leave an invisible hit area. */
-  if(lockedPopups[id]){
-    lockedPopups[id].remove();
-    delete lockedPopups[id];
-  }
-
+  setMarkerColor(id,BLUE); showRoute(id);
+  if(lockedPopups[id]){ lockedPopups[id].remove(); delete lockedPopups[id]; }
   if(el) el.classList.add("info-hidden");
 };
 </script>
